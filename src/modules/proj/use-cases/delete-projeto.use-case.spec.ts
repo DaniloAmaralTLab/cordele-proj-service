@@ -1,7 +1,7 @@
 /**
- * Unit spec for DeleteProjetoUseCase (PROJ-016).
+ * Unit spec for DeleteProjetoUseCase.
  *
- * Repository and erasure ports mocked with jest.fn(). Verifies the P6
+ * Repository and erasure ports mocked with jest.fn(). Verifies the erasure
  * contract:
  *   - Purge order PUB → COMP → IMP → DB delete (spy call order)
  *   - Failure at any erasure port aborts the cascade: DB delete NOT called,

@@ -2,17 +2,16 @@
  * Outbound port: ManuscriptErasurePort
  *
  * Purges manuscript data for a project in the IMP context, the third and
- * last leaf of the LGPD erasure cascade (P6 / PROJ-015). Called by
- * DeleteProjetoUseCase (PROJ-016) AFTER PublicationErasurePort and
+ * last leaf of the LGPD erasure cascade. Called by
+ * DeleteProjetoUseCase AFTER PublicationErasurePort and
  * CompositionErasurePort — the DB delete of projeto_editorial runs only
  * after this step succeeds.
  *
  * A failure here MUST abort the cascade before the DB delete runs — same
  * non-degraded contract as the other erasure ports.
  *
- * RULE-01: zero @prisma/client imports.
- * RULE-02: zero @nestjs/* imports.
- * RULE-06: the real HTTP adapter lives in src/infrastructure/proj/erasure/.
+ * Zero @prisma/client and @nestjs/* imports. The HTTP adapter lives in
+ * src/infrastructure/proj/erasure/.
  */
 export interface ManuscriptErasurePort {
   /**

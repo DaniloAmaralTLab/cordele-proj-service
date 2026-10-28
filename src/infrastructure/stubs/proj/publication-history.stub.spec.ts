@@ -1,5 +1,5 @@
 /**
- * Unit spec for PublicationHistoryStub (PROJ-009).
+ * Unit spec for PublicationHistoryStub.
  *
  * Verified behaviours:
  *  1. latest([]) returns empty Map and does NOT warn.
@@ -7,8 +7,6 @@
  *  3. history(projetoId) returns empty array and logs WARN with 'degraded:true'.
  *  4. signedDownloadUrl() returns { arquivoUrl, expiresAt } — never throws.
  *  5. Each method logs 'port=PublicationHistoryPort' for observability.
- *
- * RULE-05: infrastructure spec, does not import from modules/.
  */
 
 import { Logger } from '@nestjs/common';
@@ -18,7 +16,7 @@ import { PublicationHistoryStub } from './publication-history.stub';
 const EMPRESA_ID = 'empresa-id-aetos';
 const PROJETO_ID = 'proj-uuid-001';
 
-describe('PublicationHistoryStub — compile + degraded log (PROJ-009)', () => {
+describe('PublicationHistoryStub — compile + degraded log', () => {
   let stub: PublicationHistoryStub;
   let warnSpy: jest.SpyInstance;
 
@@ -101,7 +99,7 @@ describe('PublicationHistoryStub — compile + degraded log (PROJ-009)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Interface compliance — TypeScript compiles with implements clause (PROJ-009)
+  // Interface compliance — TypeScript compiles with implements clause
   // ---------------------------------------------------------------------------
 
   it('implements PublicationHistoryPort interface (latest returns Map)', async () => {

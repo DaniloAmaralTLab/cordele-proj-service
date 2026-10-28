@@ -6,9 +6,9 @@
  * it returns false — never throws — when the project belongs to a different empresa.
  *
  * Bound under `ProjetoEditorialLookupPort` token (PROJETO_EDITORIAL_LOOKUP alias)
- * in LookupPortsModule (@Global()), imported by AppModule (PROJ-006 / PROJ-008).
+ * in LookupPortsModule (@Global()), imported by AppModule.
  *
- * RULE-05: this file is in infrastructure/ — it must NOT import from modules/.
+ * This file is in infrastructure/ — it must NOT import from modules/.
  * The `ProjetoEditorialRepository` symbol is declared in domain/ and used directly
  * as the injection token so there is no cross-layer modules/ dependency.
  */

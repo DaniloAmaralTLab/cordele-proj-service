@@ -2,15 +2,14 @@
  * PubPublicationHistoryAdapter — real HTTP adapter for PublicationHistoryPort.
  *
  * Calls PUB service's endpoints to retrieve publication history and signed URLs.
- * Registered under PUBLICATION_HISTORY_PORT when PUB_SERVICE_URL is set (PROJ-INT-003).
+ * Registered under PUBLICATION_HISTORY_PORT when PUB_SERVICE_URL is set.
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: outbound HTTP clients belong in infrastructure/.
+ * Outbound HTTP clients live in infrastructure/; no modules/ imports.
  *
  * Chunking (latest() only):
  *   projetoIds in latest() is split into blocks of CROSS_SERVICE_BATCH_LIMIT (50)
  *   because the PUB batch endpoint rejects requests larger than 50 IDs with HTTP 400
- *   (contractual limit, see PUB api-contract.md). Blocks are fetched in parallel
+ *   (contractual limit of the PUB batch endpoint). Blocks are fetched in parallel
  *   via Promise.allSettled to reduce latency — see ImpManuscriptSummaryAdapter
  *   for rationale.
  *   history() and signedDownloadUrl() operate on a single projetoId and do not need
@@ -24,14 +23,14 @@
  *   - All blocks fail    → throws Error; callPort marks degraded=true and returns
  *     the empty-Map fallback.
  *
- * PUB endpoint mapping (real contract as of 2026-09-04):
+ * PUB endpoint mapping:
  *   - latest()           → POST /api/v1/pub/publications/latest-batch
  *   - history()          → GET  /api/v1/pub/projetos/{projetoId}/publicacoes
  *   - signedDownloadUrl() → GET  /api/v1/pub/projetos/{projetoId}/publicacoes/{publicacaoId}/download
  *
  * Bearer token is forwarded from the originating request so the PUB service
  * validates the same JWT principal and scope (pub:read). The header is mounted
- * only when a token is present; its value is never logged (security gate).
+ * only when a token is present; its value is never logged.
  */
 
 import { Injectable, Logger } from '@nestjs/common';

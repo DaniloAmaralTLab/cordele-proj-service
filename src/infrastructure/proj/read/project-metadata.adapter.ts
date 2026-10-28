@@ -3,15 +3,14 @@
  *
  * Calls COMP service's batch-query endpoint to retrieve editorial metadata
  * (author, layout, etc.) for a list of project IDs. Registered under
- * PROJECT_METADATA_PORT when COMP_SERVICE_URL is set (PROJ-INT-002).
+ * PROJECT_METADATA_PORT when COMP_SERVICE_URL is set.
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: outbound HTTP clients belong in infrastructure/.
+ * Outbound HTTP clients live in infrastructure/; no modules/ imports.
  *
  * Chunking:
  *   projetoIds is split into blocks of CROSS_SERVICE_BATCH_LIMIT (50) because
  *   the COMP batch endpoint rejects requests larger than 50 IDs with HTTP 400
- *   (contractual limit, see COMP api-contract.md). Blocks are fetched in parallel
+ *   (contractual limit of the COMP batch endpoint). Blocks are fetched in parallel
  *   via Promise.allSettled to reduce latency — see ImpManuscriptSummaryAdapter
  *   for rationale.
  *
@@ -25,7 +24,7 @@
  *
  * Bearer token is forwarded from the originating request so the COMP service
  * validates the same JWT principal and scope (comp:read). The header is mounted
- * only when a token is present; its value is never logged (security gate).
+ * only when a token is present; its value is never logged.
  */
 
 import { Injectable, Logger } from '@nestjs/common';

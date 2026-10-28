@@ -1,5 +1,5 @@
 /**
- * Unit spec for the three erasure port stubs (PROJ-015).
+ * Unit spec for the three erasure port stubs.
  *
  * Verified behaviours:
  *  1. Each stub's erase() resolves without error — safe no-op (idempotent).

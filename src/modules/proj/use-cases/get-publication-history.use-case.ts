@@ -1,13 +1,11 @@
 /**
  * GetPublicationHistoryUseCase — validates project ownership then delegates to
- * PublicationHistoryPort for the full publication history (T08).
+ * PublicationHistoryPort for the full publication history.
  *
  * Business rules:
  *  - Returns 404 when projetoId does not exist or belongs to a different empresa.
  *  - History is ordered by criadoEm DESC (guaranteed by the port / PUB service).
  *  - Items with erros_criticos or pendente epubcheckStatus have arquivoUrl=null.
- *
- * RULE-04: this file is in modules/ and must NOT import from infrastructure/.
  */
 
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';

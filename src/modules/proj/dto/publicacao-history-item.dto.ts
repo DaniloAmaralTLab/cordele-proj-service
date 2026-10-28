@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * One item in the publication history read-model (T08).
+ * One item in the publication history read-model.
  *
  * Aligned with api-contract.md §6.3 (PublicacaoHistoryItem). This is a
  * read-projection assembled from PUB's Publicacao records via
- * PublicationHistoryPort (ADR-003 / D-E). PROJ stores no publication rows.
+ * PublicationHistoryPort. PROJ stores no publication rows.
  *
  * Controllers MUST return this DTO (never a Prisma model) at the HTTP boundary.
  */
@@ -30,7 +30,7 @@ export class PublicacaoHistoryItemDto {
 
   /**
    * Human-readable summary of critical errors (nullable).
-   * Surfaced on T08 for erros_criticos publications.
+   * Shown on the history screen for erros_criticos publications.
    */
   @ApiPropertyOptional({
     nullable: true,
@@ -42,9 +42,9 @@ export class PublicacaoHistoryItemDto {
    * URL to the ePub artifact in object storage.
    *
    * - `null` for publications whose epubcheckStatus is erros_criticos or pendente
-   *   (no downloadable artifact — D-F).
+   *   (no downloadable artifact).
    * - A placeholder marker or short-TTL signed URL when the status is valido or avisos.
-   *   The authoritative minting path is GET /projetos/{id}/publicacoes/{pid}/download (§4.5).
+   *   The authoritative minting path is GET /projetos/{id}/publicacoes/{pid}/download (api-contract §4.5).
    */
   @ApiPropertyOptional({
     nullable: true,

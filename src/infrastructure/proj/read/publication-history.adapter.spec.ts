@@ -1,5 +1,5 @@
 /**
- * Unit tests for PubPublicationHistoryAdapter (PROJ-INT-003).
+ * Unit tests for PubPublicationHistoryAdapter.
  *
  * Contract (post-chunking update):
  *   - latest() empty projetoIds → empty Map (no HTTP call, not a degradation).
@@ -257,7 +257,7 @@ describe('PubPublicationHistoryAdapter', () => {
     });
 
     it('calls the /publicacoes endpoint path (not /publications)', async () => {
-      // Problem 3 fix: path was /publications, real endpoint is /publicacoes.
+      // The PUB endpoint is /publicacoes, not /publications.
       mockFetch.mockResolvedValue({ ok: true, json: async () => [] });
 
       await adapter.history(PROJETO_ID, EMPRESA_ID);
@@ -319,7 +319,7 @@ describe('PubPublicationHistoryAdapter', () => {
       expect(result.expiresAt).toBe('2026-08-25T15:00:00Z');
     });
 
-    it('uses projetoId in the /publicacoes/{pubId}/download path (Problem 3 fix)', async () => {
+    it('uses projetoId in the /publicacoes/{pubId}/download path', async () => {
       // Real endpoint: /api/v1/pub/projetos/{projetoId}/publicacoes/{publicacaoId}/download
       // Old (wrong):   /api/v1/pub/publications/{publicacaoId}/signed-url
       mockFetch.mockResolvedValue({
@@ -366,7 +366,7 @@ describe('PubPublicationHistoryAdapter', () => {
       expect(headers['Authorization']).toBe('Bearer bearer-tok');
     });
 
-    it('does not validate epubcheckStatus — that is the use case responsibility (PROJ-013)', async () => {
+    it('does not validate epubcheckStatus — that is the use case responsibility', async () => {
       // The adapter is agnostic about epubcheckStatus. GetSignedDownloadUrlUseCase
       // checks epubcheckStatus and throws ConflictException BEFORE calling this port.
       mockFetch.mockResolvedValue({

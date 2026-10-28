@@ -4,8 +4,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  * Response envelope for a single editorial project — full detail view.
  *
  * Aligned with api-contract.md §6.1 (ProjetoDetail). Cross-context fields
- * (manuscriptSummary, metadata, publicationHistory) are typed as unknown / null
- * stubs in P1 and receive proper nested DTOs in P4 (PROJ-010, PROJ-011).
+ * (manuscriptSummary, metadata, publicationHistory) are resolved from the
+ * outbound read ports.
  *
  * Controllers MUST return this DTO (never a Prisma model) at the HTTP boundary.
  */
@@ -38,7 +38,6 @@ export class ProjetoDetailDto {
   /**
    * Manuscript summary from IMP (ManuscriptSummaryPort).
    * Null while the project has no imported manuscript (rascunho state).
-   * Populated in P4 (PROJ-011).
    */
   @ApiPropertyOptional({
     nullable: true,
@@ -49,7 +48,6 @@ export class ProjetoDetailDto {
   /**
    * Project metadata from COMP (ProjectMetadataPort): autor, layout, etc.
    * Null until COMP has composed metadata.
-   * Populated in P4 (PROJ-011).
    */
   @ApiPropertyOptional({
     nullable: true,
@@ -60,7 +58,6 @@ export class ProjetoDetailDto {
   /**
    * Publication history from PUB (PublicationHistoryPort).
    * Empty array when the project has never been exported.
-   * Populated in P4 (PROJ-011).
    */
   @ApiPropertyOptional({
     nullable: true,
@@ -70,7 +67,7 @@ export class ProjetoDetailDto {
   readonly publicationHistory?: unknown[] | null;
 
   /**
-   * True when one or more cross-context read ports were unavailable (SPEC-07).
+   * True when one or more cross-context read ports were unavailable.
    * Clients should degrade the corresponding card fields gracefully.
    */
   @ApiPropertyOptional({ default: false })

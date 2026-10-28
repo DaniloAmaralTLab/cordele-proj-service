@@ -4,12 +4,11 @@
  * successful chunks while signalling degradation.
  *
  * Lives in domain/shared/ so both modules/ (use cases) and infrastructure/
- * (adapters) can import it without violating RULE-04 / RULE-05:
+ * (adapters) can import it without depending on each other:
  *   - infrastructure/ adapters throw it after collecting successful chunks.
  *   - modules/ use cases catch it and extract the partial data.
  *
- * RULE-01: zero @prisma/client imports.
- * RULE-02: zero @nestjs/* imports (this is pure TypeScript — no framework dependency).
+ * Pure TypeScript — zero @prisma/client and @nestjs/* imports.
  */
 export class PartialResultError<T> extends Error {
   /**

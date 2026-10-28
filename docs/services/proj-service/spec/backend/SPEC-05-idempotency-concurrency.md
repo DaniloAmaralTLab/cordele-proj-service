@@ -1,55 +1,41 @@
-# SPEC-05 — Idempotency & Concurrency
+# Idempotência e concorrência
 
-**Module:** PROJ · **Refs:** `contracts/api-contract.md` §7, `contracts/event-contracts.md` §3,
-`contracts/integration-contracts.md` §1.3, §3, local `adr/ADR-002`. EARS per
-`docs/architecture/backend/standards/ears-notation.md`.
+Não há broker, então não há reentrega de mensagens. Mas IMP, PUB e o editor podem repetir chamadas
+(timeout, clique duplo, retry) e podem chamar ao mesmo tempo sobre o mesmo projeto. Este documento diz o
+que tem de valer nesses casos.
 
-## Objetivo
+## Regras
 
-Definir idempotência de transições de status, idempotência da cascata de deleção, e concorrência de
-chamadas in-process (IMP/PUB) sobre o mesmo projeto — dado que não há broker.
-
-## Escopo
-
-- **In:** idempotência de `advanceTo`/`reopen`; idempotência da cascata (`DELETE`); concorrência de
-  transições/leituras; idempotência de eventos.
-- **Out:** retries de broker (não há broker).
-
-## Decisões técnicas
-
-- **Transição idempotente na origem:** `advanceTo`/`reopen` só emitem `ProjectStatusChanged` e escrevem
-  histórico quando o status muda de facto (SPEC-02). Retentativa in-process de IMP/PUB nunca duplica
-  evento nem regride.
-- **Cascata idempotente:** cada porta de erasure é no-op ao purgar dados já ausentes (SPEC-11), logo um
-  `DELETE` reexecutado após falha parcial completa sem erro.
-- **Concorrência:** a transição carrega/valida/escreve numa transação; `advanceTo` concorrentes no mesmo
-  projeto serializam-se na linha; a leitura da versão pós-commit é sempre coerente. Sem lock de projeto
-  para leituras (biblioteca/detalhe).
-- **Evento:** `eventId` único; sob futuro broker, chave de idempotência at-least-once.
-
-## Implementação
-
-- `advanceTo` idempotência: `target==current` ou `target==em_composicao` com current pós-composição →
-  no-op (SPEC-02 passos 3–4).
-- Escrita de status + histórico + emissão de evento na **mesma transação**; evento despachado após commit.
-- Duas transições concorrentes legais (ex.: PUB `publicado` e editor `reopen`) → serializadas; a segunda
-  reavalia a tabela contra o status já commitado.
+- **Transições idempotentes.** `advanceTo` e `reopen` só gravam histórico e emitem `ProjectStatusChanged`
+  quando o status muda de fato (ver o documento de ciclo de vida, passos 3 e 4). Repetir uma chamada não
+  duplica evento nem faz o status voltar.
+- **Exclusão idempotente.** Cada etapa de limpeza nos outros serviços é um no-op quando os dados já não
+  existem, então um `DELETE` repetido depois de uma falha parcial termina normalmente.
+- **Concorrência.** Ler o status, validar a transição e gravar acontecem como uma operação só, com a
+  linha do projeto travada. Duas chamadas simultâneas sobre o mesmo projeto ficam em fila: a segunda
+  reavalia a tabela contra o status que a primeira já gravou. Leituras (biblioteca, detalhe) não travam
+  nada.
+- **Atomicidade.** A mudança de status e a linha do histórico são gravadas na mesma transação; o evento
+  sai depois do commit.
+- Todo evento tem um `eventId` único.
 
 ## Casos de borda
 
-- PUB chama `advanceTo(publicado)` duas vezes (timeout de rede in-process) → 1ª aplica, 2ª no-op.
-- IMP `confirm-estrutura` reenviado num projeto já `em_composicao`/`publicado` → no-op, sem regressão.
-- `DELETE` reexecutado após purga parcial → completa (cada purge idempotente), depois remove a identidade.
-- Dois `reopen` concorrentes → um aplica, o outro vira no-op.
+- O PUB chama `advanceTo(publicado)` duas vezes: a primeira aplica, a segunda é no-op.
+- O IMP confirma a estrutura de novo num projeto em `em_composicao` ou `publicado`: no-op, o status não
+  volta.
+- `DELETE` repetido depois de uma limpeza parcial: completa e apaga o projeto.
+- Dois `reopen` simultâneos no mesmo projeto `publicado`: um aplica (`changed = true`, um evento) e o
+  outro vira no-op (`changed = false`, sem evento).
+- PUB `advanceTo(publicado)` e editor `reopen` ao mesmo tempo: são serializados, e o segundo é avaliado
+  contra o status deixado pelo primeiro.
 
-## Critérios de aceite (EARS)
+## Critérios de aceite
 
-- `THE SYSTEM SHALL emit ProjectStatusChanged only when the status actually changes, so retried in-process
-  calls never duplicate the event.`
-- `WHEN advanceTo targets an already-reached status, THE SYSTEM SHALL return changed=false without side effects.`
-- `THE SYSTEM SHALL apply a status change and its history row and event dispatch atomically per request.`
-- `THE SYSTEM SHALL permit concurrent advanceTo calls on the same project by serializing them at the row,
-  each re-evaluating the legal table against the committed status.`
-- `WHEN a DELETE is retried after a partial cascade, THE SYSTEM SHALL complete idempotently (each purge a
-  no-op on absent data) and then delete the identity row.`
-- `THE SYSTEM SHALL assign every published event a unique eventId.`
+- `ProjectStatusChanged` só sai quando o status muda; chamadas repetidas não duplicam o evento.
+- `advanceTo` para um status já alcançado devolve `changed = false` sem efeito colateral.
+- Mudança de status e histórico são gravados juntos, ou nenhum dos dois.
+- Duas transições simultâneas no mesmo projeto não produzem duas mudanças a partir do mesmo status
+  inicial; a segunda vê o status já gravado.
+- Um `DELETE` repetido depois de falha parcial termina e apaga o projeto.
+- Cada evento publicado tem um `eventId` único.

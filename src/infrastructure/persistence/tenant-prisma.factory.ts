@@ -15,12 +15,12 @@ import { PrismaClient } from '../prisma-client';
  *
  * Solução: um `PrismaClient` por schema, cada um com sua própria `datasourceUrl`
  * (`?schema=emp_<slug>`), cacheado pelo processo. Isso é seguro aqui porque
- * tenants são pré-cadastrados e conhecidos em design-time (multi-empresa.md —
- * "N known units of the same economic group"), não descoberta dinâmica: o
+ * tenants são pré-cadastrados e conhecidos em design-time (unidades conhecidas
+ * do mesmo grupo econômico), não descoberta dinâmica: o
  * número de clients no cache é limitado ao número de empresas do grupo, não a
  * requisições ou usuários.
  *
- * RULE-07: todo acesso a dados deve ser escopado por empresaId.
+ * Todo acesso a dados deve ser escopado por empresaId.
  *
  * Uso:
  * ```ts
@@ -28,8 +28,6 @@ import { PrismaClient } from '../prisma-client';
  *   return tx.projetoEditorial.findUnique({ where: { id } });
  * });
  * ```
- *
- * @see docs/architecture/shared/multi-empresa.md
  */
 @Injectable()
 export class TenantPrismaFactory implements OnModuleDestroy {

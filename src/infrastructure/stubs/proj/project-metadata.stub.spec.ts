@@ -1,15 +1,13 @@
 /**
- * Unit spec for ProjectMetadataStub (PROJ-009).
+ * Unit spec for ProjectMetadataStub.
  *
  * Verified behaviours:
  *  1. metadata([]) returns empty Map and does NOT warn (safe zero-project path).
  *  2. metadata([id1, id2]) returns a Map with default { autor: null } entries.
  *  3. metadata() with non-empty ids logs WARN with 'degraded:true' and
- *     'port=ProjectMetadataPort' (verifiable via Logger spy — PROJ-009 criterion).
+ *     'port=ProjectMetadataPort' (verifiable via Logger spy).
  *  4. Integration tests can override this stub via overrideProvider: stub is
  *     exported as a class so NestJS testing module can replace it under the token.
- *
- * RULE-05: infrastructure spec, does not import from modules/.
  */
 
 import { Logger } from '@nestjs/common';
@@ -18,7 +16,7 @@ import { ProjectMetadataStub } from './project-metadata.stub';
 
 const EMPRESA_ID = 'empresa-id-aetos';
 
-describe('ProjectMetadataStub — compile + degraded log (PROJ-009)', () => {
+describe('ProjectMetadataStub — compile + degraded log', () => {
   let stub: ProjectMetadataStub;
   let warnSpy: jest.SpyInstance;
 
@@ -73,7 +71,7 @@ describe('ProjectMetadataStub — compile + degraded log (PROJ-009)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Implements clause — TypeScript compiles with the interface (PROJ-009)
+  // Implements clause — TypeScript compiles with the interface
   // ---------------------------------------------------------------------------
 
   it('implements ProjectMetadataPort interface (summaries returns Map)', async () => {

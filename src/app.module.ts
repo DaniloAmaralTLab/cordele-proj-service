@@ -21,12 +21,12 @@ import { ProjModule } from './modules/proj/proj.module';
  * each other's providers directly — cross-context communication goes through
  * published contracts (HTTP or the message broker).
  *
- * P5 (PROJ-014): `APP_GUARD` registers two global guards (order matters):
+ * `APP_GUARD` registers two global guards (order matters):
  *   1. ThrottlerGuard — rate limiting (runs first, before authentication).
  *   2. JwtAuthGuard    — JWT Bearer authentication + `@RequiredScopes` scope
  *      enforcement. Registering it here (root composition) — rather than
  *      inside `ProjModule` — keeps `modules/proj/*` free of any
- *      `infrastructure/` import (RULE-04), mirroring imp-service.
+ *      `infrastructure/` import, mirroring imp-service.
  */
 @Module({
   imports: [

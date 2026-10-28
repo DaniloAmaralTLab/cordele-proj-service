@@ -19,7 +19,7 @@ import { JsonLoggerService } from './infrastructure/logging/json-logger.service'
  *  - OpenAPI document exposed at /api/docs
  */
 async function bootstrap(): Promise<void> {
-  // PROJ-017: structured JSON logger — outputs newline-delimited JSON with
+  // Structured JSON logger — outputs newline-delimited JSON with
   // required fields: level, message (containing port=<PortName> degraded:true
   // from stubs), module: 'proj', context, timestamp.
   const app = await NestFactory.create(AppModule, {

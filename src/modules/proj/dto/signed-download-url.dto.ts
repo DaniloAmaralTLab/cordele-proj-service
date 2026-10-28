@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 /**
  * Response envelope for the signed ePub download URL.
  *
- * Aligned with api-contract.md §4.5 / §6.5 (D-F). The client opens
+ * Aligned with api-contract.md §4.5 / §6.5. The client opens
  * `arquivoUrl` directly; PROJ never proxies the bytes. Only publications
  * whose epubcheckStatus is `valido` or `avisos` have a downloadable artifact.
  *

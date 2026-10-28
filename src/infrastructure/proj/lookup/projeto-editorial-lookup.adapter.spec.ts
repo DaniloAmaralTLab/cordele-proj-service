@@ -1,10 +1,10 @@
 /**
- * Unit spec for ProjetoEditorialLookupAdapter (PROJ-006 / PROJ-008).
+ * Unit spec for ProjetoEditorialLookupAdapter.
  *
  * Verified behaviours:
  *  1. exists() returns true when repository.existsByIdAndEmpresa() returns true.
  *  2. exists() returns false when repository.existsByIdAndEmpresa() returns false
- *     (projetoId inexistente — satisfies PROJ-006 missing item).
+ *     (projetoId inexistente).
  *  3. exists() returns false for a project of another empresa (cross-tenant safety):
  *     the adapter reads empresaId from EmpresaContextStore (AsyncLocalStorage),
  *     so empresa-A's request will query empresa-A's schema and return false for a
@@ -16,8 +16,6 @@
  * with jest.fn(). EmpresaContextStore is seeded via EmpresaContextStore.run()
  * so no Nest bootstrap, no DB, and no real AsyncLocalStorage infrastructure
  * is required.
- *
- * RULE-05: infrastructure/ spec, does not import from modules/.
  */
 
 import { ProjetoEditorialLookupAdapter } from './projeto-editorial-lookup.adapter';
@@ -27,7 +25,7 @@ import { EmpresaContextStore } from '../../context/empresa.context';
 const EMPRESA_A = 'empresa-a';
 const EMPRESA_B = 'empresa-b';
 
-describe('ProjetoEditorialLookupAdapter (PROJ-006 / PROJ-008)', () => {
+describe('ProjetoEditorialLookupAdapter', () => {
   let adapter: ProjetoEditorialLookupAdapter;
   let mockRepository: jest.Mocked<Pick<ProjetoEditorialRepository, 'existsByIdAndEmpresa'>>;
 
@@ -42,10 +40,10 @@ describe('ProjetoEditorialLookupAdapter (PROJ-006 / PROJ-008)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-006 core: exists() returns false for unknown projetoId (never throws)
+  // exists() returns false for unknown projetoId (never throws)
   // ---------------------------------------------------------------------------
 
-  it('returns false for a projetoId that does not exist (missing item PROJ-006)', async () => {
+  it('returns false for a projetoId that does not exist', async () => {
     mockRepository.existsByIdAndEmpresa.mockResolvedValue(false);
 
     const result = await EmpresaContextStore.run(
@@ -68,7 +66,7 @@ describe('ProjetoEditorialLookupAdapter (PROJ-006 / PROJ-008)', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-006: adapter passes real empresaId (not empty string) to repository
+  // Adapter passes real empresaId (not empty string) to repository
   // ---------------------------------------------------------------------------
 
   it('passes the active empresaId from EmpresaContextStore to existsByIdAndEmpresa', async () => {

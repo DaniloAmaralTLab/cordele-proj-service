@@ -1,13 +1,13 @@
 /**
- * Unit tests for GetProjetoLibraryUseCase (PROJ-010).
+ * Unit tests for GetProjetoLibraryUseCase.
  *
  * Critical invariants verified:
- *  1. Exactly 3 port calls per library request (batching — SPEC-10 clause 3).
- *  2. degraded=true when any port throws; own fields still returned (SPEC-07).
+ *  1. Exactly 3 port calls per library request (batching).
+ *  2. degraded=true when any port throws; own fields still returned.
  *  3. Cards reflect cross-context data when all ports succeed.
  *  4. ?status filter propagated to repository (DB-level filter, not in-memory).
  *  5. Empty project list short-circuits port calls (no wasted round-trips).
- *  6. WARN emitted with degraded:true port=<PortName> when any port degrades (PROJ-017).
+ *  6. WARN emitted with degraded:true port=<PortName> when any port degrades.
  */
 
 import { Logger } from '@nestjs/common';
@@ -74,7 +74,7 @@ describe('GetProjetoLibraryUseCase', () => {
 
     // Create use case directly (no Nest DI needed for unit tests).
     // All three stub-mode flags are false — all ports resolve to the mocked
-    // real adapters, so degraded starts at false (SPEC-07 stub-mode fix).
+    // real adapters, so degraded starts at false.
     useCase = new GetProjetoLibraryUseCase(
       repository,
       manuscriptPort,
@@ -98,7 +98,7 @@ describe('GetProjetoLibraryUseCase', () => {
 
       await useCase.execute({ empresaId: 'emp-aetos' });
 
-      // SPEC-10 clause 3: exactly 1 call per port regardless of project count
+      // Exactly 1 call per port regardless of project count
       expect(manuscriptPort.summaries).toHaveBeenCalledTimes(1);
       expect(metadataPort.metadata).toHaveBeenCalledTimes(1);
       expect(publicationPort.latest).toHaveBeenCalledTimes(1);
@@ -242,10 +242,10 @@ describe('GetProjetoLibraryUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-017: structured WARN log on degraded port (observability)
+  // Structured WARN log on degraded port (observability)
   // ---------------------------------------------------------------------------
 
-  describe('degraded WARN logging (PROJ-017)', () => {
+  describe('degraded WARN logging', () => {
     let loggerWarnSpy: jest.SpiedFunction<typeof Logger.prototype.warn>;
 
     beforeEach(() => {
@@ -314,10 +314,10 @@ describe('GetProjetoLibraryUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // SPEC-07 stub-mode degraded pre-set (Problem 3a fix)
+  // Stub-mode flag pre-sets degraded
   // ---------------------------------------------------------------------------
 
-  describe('stub-mode flag pre-sets degraded (SPEC-07 fix)', () => {
+  describe('stub-mode flag pre-sets degraded', () => {
     it('returns degraded=true when manuscriptIsStub=true even though port does not throw', async () => {
       // Instantiate with stub flag set — simulates missing IMP_SERVICE_URL.
       const useCaseWithStub = new GetProjetoLibraryUseCase(
@@ -488,7 +488,7 @@ describe('GetProjetoLibraryUseCase', () => {
   // instead of throwing, so callPort never fired and degraded stayed false.
   // ---------------------------------------------------------------------------
 
-  describe('real-adapter degradation (Problem 1 fix)', () => {
+  describe('real-adapter degradation', () => {
     it('returns degraded=true when ManuscriptSummaryPort throws (real adapter path)', async () => {
       const project = makeProject('id-1');
       repository.findAll.mockResolvedValue([project]);

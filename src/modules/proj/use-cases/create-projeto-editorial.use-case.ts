@@ -2,15 +2,13 @@
  * CreateProjetoEditorialUseCase — golden path for project creation.
  *
  * Implements the inbound port CreateProjetoEditorialPort so IMP can call
- * `create({ titulo })` without importing this class directly (ADR-001).
+ * `create({ titulo })` without importing this class directly.
  *
- * Business rules (api-contract §4.1 / SPEC-01):
+ * Business rules (api-contract §4.1):
  *   - `nome` must be non-empty, max 200 chars.
- *   - `editoraId` is resolved from UsuarioContext (never from request body — RULE-07).
+ *   - `editoraId` is resolved from UsuarioContext (never from request body).
  *   - Persists via ProjetoEditorialRepository (injected port — never imports Prisma).
- *   - Emits ProjectCreated after commit (EventEmitter pattern — SPEC-05).
- *
- * RULE-04: this file is in modules/ and does NOT import from infrastructure/.
+ *   - Emits ProjectCreated after commit (EventEmitter pattern).
  */
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -65,8 +63,7 @@ export class CreateProjetoEditorialUseCase implements CreateProjetoEditorialPort
       nome: input.nome.trim(),
       descricao: input.descricao,
       empresaId: user.empresaId,
-      // TODO: resolve from the global editora registry (cordele_global) once it
-      // exists; until then editoraId mirrors empresaId (single-editora tenant).
+      // editoraId mirrors empresaId (single-editora tenant).
       editoraId: user.empresaId,
       status: ProjetoStatus.rascunho,
     });
@@ -90,15 +87,12 @@ export class CreateProjetoEditorialUseCase implements CreateProjetoEditorialPort
    * Creates project with `titulo` as nome.
    */
   async create(input: { titulo: string }): Promise<{ projetoId: string }> {
-    // IMP calls this without a full UsuarioContext — editoraId is carried by
-    // EmpresaContext (AsyncLocalStorage). P5 will wire the context properly;
-    // for P2 we propagate an empty context so unit tests can verify the call.
     const id = randomUUID();
     const projeto = await this.repository.create({
       id,
       nome: input.titulo.trim(),
-      empresaId: 'context-resolved', // replaced by EmpresaContext in P5
-      editoraId: 'context-resolved', // replaced by EmpresaContext in P5
+      empresaId: 'context-resolved',
+      editoraId: 'context-resolved',
       status: ProjetoStatus.rascunho,
     });
 

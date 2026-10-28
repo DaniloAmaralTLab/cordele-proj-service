@@ -1,9 +1,9 @@
 /**
  * Domain event emitted after a ProjetoEditorial is created and committed.
  *
- * Pure domain type — no @nestjs/* or @prisma/client imports (RULE-01 / RULE-02).
+ * Pure domain type — no @nestjs/* or @prisma/client imports.
  * The event is fired by the application service using NestJS EventEmitter2 post-commit
- * so the listener runs outside the transaction (SPEC-05 / api-contract §7).
+ * so the listener runs outside the transaction (api-contract §7).
  */
 export class ProjectCreatedEvent {
   /** UUID v4 — unique per emission; used to detect duplicate deliveries. */

@@ -2,9 +2,8 @@
  * Unit spec for AdvanceProjetoStatusUseCase.
  *
  * Repository mocked via advanceStatusAtomic (the atomic lock + validate + write
- * method introduced in PROJ-004 to eliminate the TOCTOU race). Previous tests
- * used findById + updateStatus as two separate calls — those are replaced here
- * because the use case no longer calls them directly.
+ * method that avoids a check-then-act race). The use case does not call
+ * findById + updateStatus directly.
  *
  * What this spec covers:
  *   - Legal transition: advanceStatusAtomic returns changed=true → event emitted
@@ -146,7 +145,7 @@ describe('AdvanceProjetoStatusUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Idempotent no-op (SPEC-02 IMP idempotency rule)
+  // Idempotent no-op (repeated IMP calls)
   // ---------------------------------------------------------------------------
 
   describe('advanceTo() — idempotent no-op', () => {

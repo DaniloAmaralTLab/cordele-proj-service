@@ -29,7 +29,7 @@ import {
 import { ProjetoStatus } from '../../domain/proj/value-objects/project-status.vo';
 
 /**
- * Unit tests for ProjController (P5 update + §4.8 advance-status).
+ * Unit tests for ProjController.
  *
  * The controller now has use case dependencies injected via DI tokens.
  * This spec mocks all use cases so the controller can be tested in isolation.
@@ -317,8 +317,8 @@ describe('ProjController', () => {
       expect(result.expiresAt).toBeDefined();
     });
 
-    it('returns only the signed URL (no byte streaming) — PROJ-013 contract', async () => {
-      // PROJ-013 clause: controller NEVER proxies bytes; it returns only { publicacaoId, arquivoUrl, expiresAt }.
+    it('returns only the signed URL (no byte streaming)', async () => {
+      // The controller NEVER proxies bytes; it returns only { publicacaoId, arquivoUrl, expiresAt }.
       // A streaming response would be an instance of StreamableFile or have a `pipe` method.
       const projetoId = '11111111-1111-1111-1111-111111111111';
       const publicacaoId = '22222222-2222-2222-2222-222222222222';
@@ -522,7 +522,7 @@ describe('ProjController', () => {
   ];
 
   // ---------------------------------------------------------------------------
-  // P9 (PROJ-014): Auth integration (supertest) — 401 and 403 behavior
+  // Auth integration (supertest) — 401 and 403 behavior
   //
   // These tests spin up a minimal NestJS HTTP application backed by
   // TestingModule (no real DB, no real Keycloak) to verify that the HTTP layer
@@ -531,7 +531,7 @@ describe('ProjController', () => {
   // JWKS round-trip never happens.
   // ---------------------------------------------------------------------------
 
-  describe('Auth gates (supertest integration) — PROJ-014', () => {
+  describe('Auth gates (supertest integration)', () => {
     let authApp: INestApplication;
 
     beforeAll(async () => {
@@ -674,20 +674,20 @@ describe('ProjController', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // P9 (PROJ-014): EmpresaContextStore ALS population
+  // EmpresaContextStore ALS population
   //
   // Verifies that after JwtAuthGuard authenticates a request, the empresaId
   // from the JWT claim is passed to EmpresaContextStore.run() by
   // EmpresaContextInterceptor — which is the canonical way to prove that the
   // context comes from the JWT (never from body or path params).
   //
-  // The responsibility was moved from JwtAuthGuard.canActivate() (which used
-  // enterWith() after an await — non-propagating across async resources) to
-  // EmpresaContextInterceptor (which uses store.run() around next.handle()).
+  // This lives in EmpresaContextInterceptor (store.run() around next.handle())
+  // rather than JwtAuthGuard.canActivate(), because enterWith() after an await
+  // does not propagate across async resources.
   // See als-guard-propagation.spec.ts for the empirical proof.
   // ---------------------------------------------------------------------------
 
-  describe('EmpresaContextStore ALS population (PROJ-014)', () => {
+  describe('EmpresaContextStore ALS population', () => {
     let alsApp: INestApplication;
 
     beforeAll(async () => {
@@ -737,8 +737,8 @@ describe('ProjController', () => {
     });
 
     it('EmpresaContextStore.getEditoraId() returns the empresaId from the JWT claim', async () => {
-      // Spy on store.run: the PROJ-014 criterion is that EmpresaContextInterceptor
-      // reads empresaId from request.user (set by JwtAuthGuard from the JWT claim)
+      // Spy on store.run: EmpresaContextInterceptor must read empresaId
+      // from request.user (set by JwtAuthGuard from the JWT claim)
       // and passes it to EmpresaContextStore.run() — never from body or path params.
       // The spy captures the argument without relying on ALS propagation across
       // async boundaries, which is not the focus of this contract test.
@@ -751,7 +751,7 @@ describe('ProjController', () => {
 
       // EmpresaContextInterceptor must have called run() with { editoraId: 'aetos' }
       // (the value from the JWT claim via request.user.empresaId), not from
-      // body or path params (PROJ-014 criterion 3).
+      // body or path params.
       expect(runSpy).toHaveBeenCalledWith(
         expect.objectContaining({ editoraId: 'aetos' }),
         expect.any(Function),
@@ -761,7 +761,7 @@ describe('ProjController', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // P5 (PROJ-014): @RequiredScopes metadata — enforced by JwtAuthGuard
+  // @RequiredScopes metadata — enforced by JwtAuthGuard
   // ---------------------------------------------------------------------------
 
   describe('@RequiredScopes metadata', () => {

@@ -1,5 +1,5 @@
 /**
- * Unit tests for CompCompositionErasureAdapter (PROJ-INT-005).
+ * Unit tests for CompCompositionErasureAdapter.
  *
  * Mirrors PubPublicationErasureAdapter's non-degraded contract: every failure
  * path must throw so DeleteProjetoUseCase aborts the cascade.
@@ -45,7 +45,7 @@ describe('CompCompositionErasureAdapter', () => {
 
   it('resolves (idempotent) when project has no COMP compositions — COMP returns 204 no-op', async () => {
     // COMP is idempotent: when there are no compositions for the project it returns 204 (safe no-op).
-    // The adapter must complete without error so the LGPD cascade (PROJ-016) can proceed.
+    // The adapter must complete without error so the LGPD cascade can proceed.
     mockFetch.mockResolvedValue({ ok: true, status: 204 });
 
     await expect(adapter.erase('projeto-sem-composicao', 'emp-aetos')).resolves.toBeUndefined();

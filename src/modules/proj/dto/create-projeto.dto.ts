@@ -7,7 +7,7 @@ import { IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-va
  * Aligned with api-contract.md §4.1:
  *   { "nome": "Romance das Cidades", "descricao": "optional" }
  *
- * `editoraId` is NOT here; it is resolved from the JWT tenant claim (RULE-07).
+ * `editoraId` is NOT here; it is resolved from the JWT tenant claim.
  * The global ValidationPipe (whitelist + forbidNonWhitelisted) rejects any
  * property not declared in this class.
  */

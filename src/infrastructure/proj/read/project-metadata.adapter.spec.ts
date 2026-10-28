@@ -1,5 +1,5 @@
 /**
- * Unit tests for CompProjectMetadataAdapter (PROJ-INT-002).
+ * Unit tests for CompProjectMetadataAdapter.
  *
  * Contract (post-chunking update):
  *   - Empty projetoIds → empty Map (no HTTP call, not a degradation).
@@ -201,7 +201,7 @@ describe('CompProjectMetadataAdapter', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Degradation: adapter throws so callPort can mark degraded=true (Problem 1 fix)
+  // Degradation: adapter throws so callPort can mark degraded=true
   // ---------------------------------------------------------------------------
 
   it('throws when COMP is unavailable (callPort will catch and mark degraded)', async () => {
@@ -227,7 +227,7 @@ describe('CompProjectMetadataAdapter', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Bearer token propagation (Problem 2 fix)
+  // Bearer token propagation
   // ---------------------------------------------------------------------------
 
   it('mounts Authorization header when bearerToken is provided', async () => {

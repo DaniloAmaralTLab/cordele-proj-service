@@ -14,54 +14,50 @@ import {
   REOPEN_PROJECT_USE_CASE,
 } from './proj.tokens';
 
-// P2 use case implementations (modules/ classes — RULE-04 compliant)
+// Write-side use cases
 import { CreateProjetoEditorialUseCase } from './use-cases/create-projeto-editorial.use-case';
 import { AdvanceProjetoStatusUseCase } from './use-cases/advance-projeto-status.use-case';
 import { ReopenProjectForRevisionUseCase } from './use-cases/reopen-project-for-revision.use-case';
 
-// P4 use case implementations (PROJ-010..013)
+// Read-side use cases
 import { GetProjetoLibraryUseCase } from './use-cases/get-projeto-library.use-case';
 import { GetProjetoDetailUseCase } from './use-cases/get-projeto-detail.use-case';
 import { GetPublicationHistoryUseCase } from './use-cases/get-publication-history.use-case';
 import { GetSignedDownloadUrlUseCase } from './use-cases/get-signed-download-url.use-case';
 
-// P6 use case implementation (PROJ-016)
+// LGPD erasure use case
 import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
 
 /**
  * PROJ — Projetos Editoriais bounded context module.
  *
- * P4 update: the four P4 use cases (PROJ-010..013) are registered with
- * useClass so Nest's DI resolves their injected port dependencies.
+ * Use cases are registered with useClass so Nest's DI resolves their
+ * injected port dependencies.
  *
  * Read port tokens (MANUSCRIPT_SUMMARY_PORT, PROJECT_METADATA_PORT,
  * PUBLICATION_HISTORY_PORT) are provided globally by ReadPortsModule
  * (@Global()) imported in AppModule. ProjModule never imports
- * infrastructure/ directly (RULE-04 compliant).
+ * infrastructure/ directly.
  *
- * P3 note: PROJETO_EDITORIAL_REPOSITORY is provided globally by
- * PersistenceModule (@Global()); same pattern applies here.
- *
- * RULE-04: modules/ must not import infrastructure/ directly. ✓
+ * PROJETO_EDITORIAL_REPOSITORY is provided globally by PersistenceModule
+ * (@Global()) in the same way.
  */
 @Module({
   controllers: [ProjController],
   providers: [
     // NOTE: PROJETO_EDITORIAL_REPOSITORY is provided globally by
-    // PersistenceModule (P3). No stub here — AppModule imports
-    // PersistenceModule which is @Global(), making the token available.
+    // PersistenceModule, which AppModule imports as @Global().
 
-    // --- Event publisher stub (P2) —
-    // Real binding to EventEmitter2 added when @nestjs/event-emitter is configured.
+    // --- Event publisher (no-op) ---
     {
       provide: PROJECT_EVENT_PUBLISHER,
       useValue: { publish: () => undefined },
     },
 
-    // --- P2 use cases (PROJ-003, PROJ-004, PROJ-005) ---
+    // --- Write-side use cases ---
 
     /**
-     * PROJ-003: CreateProjetoEditorialUseCase
+     * CreateProjetoEditorialUseCase
      * Also satisfies CreateProjetoEditorialPort for IMP.
      */
     {
@@ -70,7 +66,7 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     /**
-     * PROJ-004: AdvanceProjetoStatusUseCase
+     * AdvanceProjetoStatusUseCase
      * Called by IMP (confirm-estrutura) and PUB (export result).
      */
     {
@@ -79,7 +75,7 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     /**
-     * PROJ-005: ReopenProjectForRevisionUseCase
+     * ReopenProjectForRevisionUseCase
      * The one deliberate backward edge; editor-only.
      */
     {
@@ -88,20 +84,20 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     // NOTE: PROJETO_EDITORIAL_LOOKUP is provided globally by LookupPortsModule
-    // (@Global()) imported in AppModule (PROJ-006 / PROJ-008). The real adapter
+    // (@Global()) imported in AppModule. The adapter
     // (ProjetoEditorialLookupAdapter) reads empresaId from EmpresaContextStore
     // (AsyncLocalStorage populated by JwtAuthGuard) and delegates to the
     // ProjetoEditorialRepository for cross-tenant safety.
-    // ProjModule never imports infrastructure/ directly (RULE-04 compliant).
+    // ProjModule never imports infrastructure/ directly.
 
     // NOTE: MANUSCRIPT_SUMMARY_PORT, PROJECT_METADATA_PORT, PUBLICATION_HISTORY_PORT
     // are provided globally by ReadPortsModule (@Global()) imported in AppModule.
-    // ProjModule never references them here (RULE-04 compliant).
+    // ProjModule never references them here.
 
-    // --- P4 use cases (PROJ-010..013) ---
+    // --- Read-side use cases ---
 
     /**
-     * PROJ-010: GetProjetoLibraryUseCase
+     * GetProjetoLibraryUseCase
      * Batches 3 port calls; degrades gracefully when any port throws.
      */
     {
@@ -110,7 +106,7 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     /**
-     * PROJ-011: GetProjetoDetailUseCase
+     * GetProjetoDetailUseCase
      * Composes cross-context fields for one project.
      */
     {
@@ -119,7 +115,7 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     /**
-     * PROJ-012: GetPublicationHistoryUseCase
+     * GetPublicationHistoryUseCase
      * Returns publication list ordered newest-first.
      */
     {
@@ -128,7 +124,7 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     /**
-     * PROJ-013: GetSignedDownloadUrlUseCase
+     * GetSignedDownloadUrlUseCase
      * Returns 409 for erros_criticos/pendente; mints URL for valido/avisos.
      */
     {
@@ -137,11 +133,11 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
 
     /**
-     * PROJ-016: DeleteProjetoUseCase
+     * DeleteProjetoUseCase
      * Orchestrates the leaf-first LGPD erasure cascade (PUB -> COMP -> IMP ->
      * DB delete). PUBLICATION_ERASURE_PORT, COMPOSITION_ERASURE_PORT and
      * MANUSCRIPT_ERASURE_PORT are provided globally by ErasurePortsModule
-     * (@Global()) imported in AppModule — same pattern as the P4 read ports.
+     * (@Global()) imported in AppModule — same pattern as the read ports.
      */
     {
       provide: DELETE_PROJETO_USE_CASE,
@@ -149,7 +145,7 @@ import { DeleteProjetoUseCase } from './use-cases/delete-projeto.use-case';
     },
   ],
   exports: [
-    // PROJ-006: 3 inbound ports exported for IMP / PUB / editor callers
+    // 3 inbound ports exported for IMP / PUB / editor callers
     // NOTE: PROJETO_EDITORIAL_LOOKUP is provided globally by LookupPortsModule (@Global())
     // and is automatically available to all modules — no re-export needed here.
     CREATE_PROJETO_USE_CASE,
@@ -161,11 +157,10 @@ export class ProjModule implements NestModule {
   /**
    * Apply EmpresaContext middleware to all routes handled by this module.
    *
-   * P1 stub: still a no-op passthrough. P5 (PROJ-014) resolves `empresaId`
-   * from the JWT claim via `@CurrentUser()` in `ProjController` and passes it
-   * explicitly into every use case call (the pattern already established by
-   * P3/P4 repositories and use cases) instead of populating an
-   * AsyncLocalStorage store here — Express middleware runs before
+   * The middleware is a passthrough. `empresaId` is resolved from the JWT
+   * claim via `@CurrentUser()` in `ProjController` and passed explicitly into
+   * every use case call instead of populating an AsyncLocalStorage store
+   * here — Express middleware runs before
    * `JwtAuthGuard`, so `req.user` is not yet available at this stage.
    */
   configure(consumer: MiddlewareConsumer): void {

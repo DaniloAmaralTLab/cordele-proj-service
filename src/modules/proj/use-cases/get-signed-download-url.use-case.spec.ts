@@ -1,5 +1,5 @@
 /**
- * Unit tests for GetSignedDownloadUrlUseCase (PROJ-013).
+ * Unit tests for GetSignedDownloadUrlUseCase.
  *
  * Verified behaviours:
  *  1. Returns signed URL for valido publication.

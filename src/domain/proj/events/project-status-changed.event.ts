@@ -1,9 +1,9 @@
 /**
  * Domain event emitted after a ProjetoEditorial status transition is committed.
  *
- * Pure domain type — no @nestjs/* or @prisma/client imports (RULE-01 / RULE-02).
+ * Pure domain type — no @nestjs/* or @prisma/client imports.
  * Emitted by AdvanceProjetoStatusUseCase and ReopenProjectForRevisionUseCase only
- * when the status actually changed (NOT emitted on idempotent no-ops — SPEC-02).
+ * when the status actually changed (NOT emitted on idempotent no-ops).
  */
 export class ProjectStatusChangedEvent {
   /** UUID v4 — unique per emission; used to detect duplicate deliveries. */

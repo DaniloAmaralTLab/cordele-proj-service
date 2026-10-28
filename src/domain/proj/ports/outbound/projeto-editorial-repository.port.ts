@@ -3,18 +3,17 @@
  *
  * Pure domain interface for ProjetoEditorial persistence.
  *
- * RULE-01: zero @prisma/client imports.
- * RULE-02: zero @nestjs/* imports.
- * RULE-07: every operation requires empresaId to enforce tenant isolation.
+ * Zero @prisma/client and @nestjs/* imports. Every operation requires
+ * empresaId to enforce tenant isolation.
  *
  * The Prisma adapter (PrismaProjetoEditorialRepository) implementing this port
- * lives in src/infrastructure/persistence/proj/ and is bound via P3 (PROJ-008).
+ * lives in src/infrastructure/persistence/proj/.
  *
  * Method signatures pass empresaId explicitly so:
- *  - P2 use cases (which receive it from UsuarioContext) can call without a
- *    populated AsyncLocalStorage (P5 will wire that middleware).
+ *  - Use cases (which receive it from UsuarioContext) can call without
+ *    depending on a populated AsyncLocalStorage.
  *  - The adapter passes it to TenantPrismaFactory.withTenant() to select the
- *    correct Postgres schema — never a hard-coded schema name (RULE-07).
+ *    correct Postgres schema — never a hard-coded schema name.
  */
 
 import type { ProjetoStatus } from '../../value-objects/project-status.vo';
@@ -39,7 +38,7 @@ export interface CreateProjetoEditorialInput {
   readonly id: string;
   readonly nome: string;
   readonly descricao?: string;
-  /** Tenant-routing key (resolves the `emp_<slug>` schema, RULE-07). */
+  /** Tenant-routing key (resolves the `emp_<slug>` schema). */
   readonly empresaId: string;
   /** Logical reference to the editora registry (`cordele_global`) — never used for schema routing. */
   readonly editoraId: string;
@@ -142,13 +141,13 @@ export interface ProjetoEditorialRepositoryPort {
   /**
    * Hard-deletes a ProjetoEditorial and, via ON DELETE CASCADE in the DB,
    * removes all its projeto_status_historico rows.
-   * Used exclusively by the LGPD erasure use case (P6 / PROJ-015).
+   * Used exclusively by the LGPD erasure use case.
    */
   delete(id: string, empresaId: string): Promise<void>;
 
   /**
    * Returns false when id does not exist OR belongs to a different empresa.
-   * Used by ProjetoEditorialLookup (cross-context tenancy gate, PROJ-006).
+   * Used by ProjetoEditorialLookup (cross-context tenancy gate).
    */
   existsByIdAndEmpresa(id: string, empresaId: string): Promise<boolean>;
 
@@ -159,9 +158,8 @@ export interface ProjetoEditorialRepositoryPort {
    * writes both the status UPDATE and the projeto_status_historico INSERT inside
    * the same Prisma $transaction (lock held until commit).
    *
-   * This eliminates the TOCTOU window that existed when findById and updateStatus
-   * were called in separate transactions: concurrent advanceTo calls now serialize
-   * at the database row lock, so at most one of them will observe "changed=true".
+   * Because the read and the write share one transaction and row lock,
+   * concurrent advanceTo calls serialize at the database row lock, so at most one of them will observe "changed=true".
    *
    * Returns null when the project does not exist in this empresa.
    * Throws IllegalStatusTransitionError for illegal moves (same as ProjectStatusVO).

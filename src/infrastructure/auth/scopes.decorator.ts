@@ -19,7 +19,7 @@ export const SCOPES_KEY = 'scopes';
  * at least one of the listed scopes, `ScopesGuard` throws a `ForbiddenException`
  * (HTTP 403).
  *
- * **RULE-04 note:** controllers in `modules/proj/` should use `@RequiredScopes()`
+ * **Note:** controllers in `modules/proj/` should use `@RequiredScopes()`
  * from `modules/proj/decorators/require-scope.decorator.ts` instead of this
  * decorator — that keeps `modules/` free of `infrastructure/` imports. This
  * decorator is intended for use within `infrastructure/` or for guard composition

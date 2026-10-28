@@ -1,7 +1,7 @@
 /**
  * Unit spec for ReopenProjectForRevisionUseCase.
  *
- * Repository and event publisher mocked with jest.fn(). Verifies PROJ-005:
+ * Repository and event publisher mocked with jest.fn(). Verifies:
  *   - Reopen from publicado returns 200 with em_composicao
  *   - Idempotent on em_composicao (no event, no DB write)
  *   - Rejects from rascunho with IllegalStatusTransitionError

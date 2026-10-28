@@ -1,18 +1,16 @@
 /**
  * ManuscriptSummaryStub — in-memory fallback adapter for ManuscriptSummaryPort.
  *
- * Registered under MANUSCRIPT_SUMMARY_PORT in P4. Replaced by the real HTTP
- * adapter (ImpManuscriptSummaryAdapter) once IMP service is scaffolded
- * (PROJ-INT-001).
+ * Registered under MANUSCRIPT_SUMMARY_PORT when IMP_SERVICE_URL is not set;
+ * otherwise the real HTTP adapter (ImpManuscriptSummaryAdapter) is used.
  *
  * Behaviour:
  *   - Returns a Map with a default zero-count entry for each projetoId so that
  *     the library renders cleanly without an IMP service dependency.
- *   - Logs WARN on every call to signal degraded-mode operation (D-480).
+ *   - Logs WARN on every call to signal degraded-mode operation.
  *   - Empty input returns empty Map (safe for zero-project requests).
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: this file is the stub; the real HTTP client is in infrastructure/proj/read/.
+ * The real HTTP client is in infrastructure/proj/read/.
  */
 
 import { Logger } from '@nestjs/common';

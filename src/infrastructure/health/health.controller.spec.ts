@@ -1,5 +1,5 @@
 /**
- * Unit tests for HealthController (PROJ-017).
+ * Unit tests for HealthController.
  *
  * Verified behaviours:
  *  1. GET /health delegates to HealthCheckService and returns the result (200).

@@ -3,14 +3,12 @@
  *
  * Calls IMP service's internal erasure endpoint to purge all manuscript data
  * for a project. Registered under MANUSCRIPT_ERASURE_PORT when
- * IMP_SERVICE_URL is configured (env-flag switch in erasure-ports.module.ts —
- * PROJ-INT-004).
+ * IMP_SERVICE_URL is configured (env-flag switch in erasure-ports.module.ts).
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: this is the correct place for outbound HTTP clients.
+ * Outbound HTTP clients live in infrastructure/; no modules/ imports.
  *
  * Error handling: must not degrade silently — an unreachable IMP or a
- * non-2xx response throws, so DeleteProjetoUseCase (PROJ-016) aborts the
+ * non-2xx response throws, so DeleteProjetoUseCase aborts the
  * cascade before the DB delete runs (this is the last leaf before step 4).
  */
 

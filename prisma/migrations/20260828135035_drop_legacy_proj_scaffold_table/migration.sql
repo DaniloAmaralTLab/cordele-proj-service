@@ -1,6 +1,4 @@
--- Removes the scaffold-generated `Proj` reference entity (proj_proj table).
--- Superseded since P3 by the real ProjetoEditorial aggregate; the legacy CRUD
--- adapter (PrismaProjRepository / ProjService) was dead code, never wired to
--- ProjController, and has been removed from the application layer.
+-- Removes the old placeholder `Proj` table (proj_proj), which was replaced by
+-- projeto_editorial and is no longer used anywhere.
 -- DropTable
 DROP TABLE "proj_proj";

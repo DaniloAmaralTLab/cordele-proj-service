@@ -2,7 +2,7 @@
  * Unit spec for CreateProjetoEditorialUseCase.
  *
  * Repository and event publisher are mocked with jest.fn() — no DB, no Nest
- * bootstrap, no EventEmitter2. Verifies PROJ-003 acceptance criteria:
+ * bootstrap, no EventEmitter2. Verifies:
  *   - Valid nome creates the project and emits ProjectCreated
  *   - Empty nome throws a validation error; nothing is persisted
  *   - editoraId is resolved from UsuarioContext, never from request body
@@ -60,7 +60,7 @@ describe('CreateProjetoEditorialUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-003 criterion 1: valid nome creates + emits
+  // Valid nome creates + emits
   // ---------------------------------------------------------------------------
 
   describe('execute() — valid input', () => {
@@ -113,7 +113,7 @@ describe('CreateProjetoEditorialUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-003 criterion 3: editoraId from context, not from body
+  // editoraId from context, not from body
   // ---------------------------------------------------------------------------
 
   describe('execute() — editoraId resolved from UsuarioContext', () => {
@@ -143,7 +143,7 @@ describe('CreateProjetoEditorialUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-003 criterion 2: empty nome throws ValidationError; nothing persisted
+  // Empty nome throws ValidationError; nothing persisted
   // ---------------------------------------------------------------------------
 
   describe('execute() — validation errors', () => {
@@ -177,7 +177,7 @@ describe('CreateProjetoEditorialUseCase', () => {
     });
 
     // ---------------------------------------------------------------------------
-    // PROJ-003 criterion 4: error type maps to HTTP 400 urn:cordele:proj:validation
+    // Error type maps to HTTP 400 urn:cordele:proj:validation
     // ---------------------------------------------------------------------------
 
     it('throws with type=urn:cordele:proj:validation when nome is empty (400 mapping)', async () => {

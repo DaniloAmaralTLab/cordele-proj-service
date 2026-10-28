@@ -1,12 +1,12 @@
 /**
- * GetProjetoLibraryUseCase — returns a paginated project library (T02) with
+ * GetProjetoLibraryUseCase — returns a paginated project library with
  * cross-context fields composed from IMP, COMP and PUB in a single batched
  * round-trip per page.
  *
- * SPEC-03 clause 1: ordered by ultimaAtividadeEm DESC (tiebreak: id ASC for
+ * Ordered by ultimaAtividadeEm DESC (tiebreak: id ASC for
  *   deterministic keyset pagination).
- * SPEC-10 clause 3: exactly ONE call per read-port per page (batch of page IDs).
- * SPEC-07: when any port throws, degraded=true and the corresponding card fields
+ * Exactly ONE call per read-port per page (batch of page IDs).
+ * When any port throws, degraded=true and the corresponding card fields
  *   fall back to safe defaults (zeros / null) — the endpoint never fails.
  *
  * Pagination (keyset / cursor-based):
@@ -21,8 +21,6 @@
  *   exceeds `limit` there is at least one more page, and a `nextCursor` is
  *   generated from the last row of the current page. The cursor is opaque to
  *   callers: base64(JSON({atualizadoEm: ISO-8601, id: UUID})).
- *
- * RULE-04: this file is in modules/ and must NOT import from infrastructure/.
  */
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -76,7 +74,7 @@ export interface GetProjetoLibraryInput {
 
 export interface GetProjetoLibraryResult {
   readonly cards: ProjetoCardDto[];
-  /** True when one or more cross-context ports were unavailable (SPEC-07). */
+  /** True when one or more cross-context ports were unavailable. */
   readonly degraded: boolean;
   /**
    * Opaque cursor to pass as `cursor` on the next request to retrieve the
@@ -142,7 +140,7 @@ export class GetProjetoLibraryUseCase {
     // --- Batched cross-context reads: exactly 3 port calls per page ---
     // Pre-set degraded when any port resolved to its stub adapter at startup
     // (stubs return valid defaults but never throw, so callPort's catch would
-    // never fire — SPEC-07 fix, Problem 3a).
+    // never fire).
     let degraded = this.manuscriptIsStub || this.metadataIsStub || this.historyIsStub;
     const markDegraded = () => { degraded = true; };
 

@@ -1,11 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * Response envelope for one project in the library list (T02).
+ * Response envelope for one project in the library list.
  *
  * Aligned with api-contract.md §6.2 (ProjetoCard). Cross-context fields
  * (autor, totalCapitulos, totalImagens, ultimoEpubcheckStatus) are resolved
- * from outbound read ports in P4 (PROJ-010); stubs return null / 0 in P1.
+ * from the outbound read ports.
  *
  * Controllers MUST return this DTO (never a Prisma model) at the HTTP boundary.
  */

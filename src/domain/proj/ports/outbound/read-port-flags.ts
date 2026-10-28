@@ -4,16 +4,15 @@
  *
  * Defined in domain/ so that:
  *  - infrastructure/proj/read-ports.module.ts can provide these tokens
- *    (infrastructure → domain is allowed by RULE-05).
+ *    (infrastructure → domain is an allowed dependency).
  *  - modules/proj/use-cases/*.ts can inject them
  *    (modules → domain is the standard direction).
  *
  * When `true`, the corresponding port resolved to its in-memory stub adapter
  * and the use case MUST pre-set degraded=true without waiting for a thrown
- * error (stubs return valid defaults, they never throw — SPEC-07 fix).
+ * error (stubs return valid defaults, they never throw).
  *
- * RULE-01: no @nestjs/common imports — pure TS constants.
- * RULE-02: no @prisma/client imports.
+ * Pure TS constants — no @nestjs/common or @prisma/client imports.
  */
 
 /** True when IMP_SERVICE_URL is absent and ManuscriptSummaryStub is active. */

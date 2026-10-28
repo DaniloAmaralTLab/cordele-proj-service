@@ -1,17 +1,16 @@
 /**
- * Unit spec for ManuscriptSummaryStub (PROJ-017 observability assertion).
+ * Unit spec for ManuscriptSummaryStub (observability).
  *
  * Verified behaviours:
  *  1. summaries() called with an empty array returns an empty Map — no log emitted.
  *  2. summaries() called with non-empty ids returns a populated Map (default zeros).
  *  3. summaries() in degraded mode (non-empty ids) emits logger.warn() with a
  *     message containing 'degraded:true' and 'port=ManuscriptSummaryPort'
- *     (verifiable via Logger spy — satisfies PROJ-017 observability criterion).
+ *     (verifiable via Logger spy).
  *
  * Note on correlationId: the ManuscriptSummaryPort interface only receives
- * projetoIds and empresaId; correlationId propagation into the stub log requires
- * a shared AsyncLocalStorage store (deferred — out of scope for PROJ-017 unit
- * tests; integration coverage would wire the CorrelationIdInterceptor context).
+ * projetoIds and empresaId, so these unit tests do not assert a correlationId in
+ * the stub log.
  */
 
 import { Logger } from '@nestjs/common';
@@ -20,7 +19,7 @@ import { ManuscriptSummaryStub } from './manuscript-summary.stub';
 
 const EMPRESA_ID = 'empresa-id-aetos';
 
-describe('ManuscriptSummaryStub — observability (PROJ-017)', () => {
+describe('ManuscriptSummaryStub — observability', () => {
   let stub: ManuscriptSummaryStub;
   let warnSpy: jest.SpyInstance;
 

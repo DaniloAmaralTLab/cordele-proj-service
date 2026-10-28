@@ -2,7 +2,7 @@
  * Thrown when a status transition is attempted that is not in the
  * legal-transition table defined in api-contract §7.
  *
- * Pure domain error — no @nestjs/* or @prisma/client imports (RULE-01 / RULE-02).
+ * Pure domain error — no @nestjs/* or @prisma/client imports.
  * REST callers map this to 409 urn:cordele:proj:illegal-status-transition.
  */
 export class IllegalStatusTransitionError extends Error {

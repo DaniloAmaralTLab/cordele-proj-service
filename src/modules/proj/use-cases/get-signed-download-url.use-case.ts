@@ -1,14 +1,12 @@
 /**
  * GetSignedDownloadUrlUseCase — obtains a short-TTL signed URL for downloading
- * an ePub artifact (api-contract §4.5 / D-F).
+ * an ePub artifact (api-contract §4.5).
  *
- * Business rules (PROJ-013 / SPEC-06 clause 4):
+ * Business rules:
  *  - Only publications with epubcheckStatus `valido` or `avisos` are downloadable.
  *  - `erros_criticos` and `pendente` → throw ArtifactNotAvailableError (maps to 409).
  *  - The use case validates ownership and status; PublicationHistoryPort mints the URL.
  *  - PROJ never proxies bytes — the signed URL is returned to the SPA for direct use.
- *
- * RULE-04: this file is in modules/ and must NOT import from infrastructure/.
  */
 
 import {

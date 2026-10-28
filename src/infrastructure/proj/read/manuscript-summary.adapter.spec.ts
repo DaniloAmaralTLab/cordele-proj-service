@@ -1,5 +1,5 @@
 /**
- * Unit tests for ImpManuscriptSummaryAdapter (PROJ-INT-001).
+ * Unit tests for ImpManuscriptSummaryAdapter.
  *
  * Uses jest-fetch-mock pattern: replaces globalThis.fetch with a jest mock
  * to avoid real HTTP calls while keeping the adapter logic testable.
@@ -228,7 +228,7 @@ describe('ImpManuscriptSummaryAdapter', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Degradation: adapter throws so callPort can mark degraded=true (Problem 1 fix)
+  // Degradation: adapter throws so callPort can mark degraded=true
   // ---------------------------------------------------------------------------
 
   it('throws when IMP returns non-200 for a single chunk (callPort will catch and mark degraded)', async () => {
@@ -258,7 +258,7 @@ describe('ImpManuscriptSummaryAdapter', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // Bearer token propagation (Problem 2 fix)
+  // Bearer token propagation
   // ---------------------------------------------------------------------------
 
   it('mounts Authorization header when bearerToken is provided', async () => {

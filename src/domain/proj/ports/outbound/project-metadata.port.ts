@@ -3,11 +3,10 @@
  *
  * Queries the COMP context for editorial metadata (author, layout, etc.) for
  * a batch of projects. Called once per library/detail request with ALL projetoIds
- * to enforce the batching invariant (SPEC-10 clause 3 — no N+1 port calls).
+ * to enforce the batching invariant (no N+1 port calls).
  *
- * RULE-01: zero @prisma/client imports.
- * RULE-02: zero @nestjs/* imports.
- * RULE-06: the real HTTP adapter lives in src/infrastructure/proj/read/.
+ * Zero @prisma/client and @nestjs/* imports. The HTTP adapter lives in
+ * src/infrastructure/proj/read/.
  */
 
 /** Composition metadata for one project (sourced from COMP). */
@@ -23,8 +22,8 @@ export interface ProjectMetadata {
  * Port interface for batch-reading project metadata from COMP.
  *
  * Implementations:
- *  - Stub (P4): src/infrastructure/stubs/proj/project-metadata.stub.ts
- *  - Real HTTP adapter (PROJ-INT-002): src/infrastructure/proj/read/project-metadata.adapter.ts
+ *  - In-memory stub: src/infrastructure/stubs/proj/project-metadata.stub.ts
+ *  - HTTP adapter: src/infrastructure/proj/read/project-metadata.adapter.ts
  */
 export interface ProjectMetadataPort {
   /**

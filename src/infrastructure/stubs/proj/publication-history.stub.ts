@@ -1,18 +1,16 @@
 /**
  * PublicationHistoryStub — in-memory fallback adapter for PublicationHistoryPort.
  *
- * Registered under PUBLICATION_HISTORY_PORT in P4. Replaced by the real HTTP
- * adapter (PubPublicationHistoryAdapter) once PUB service is scaffolded
- * (PROJ-INT-003).
+ * Registered under PUBLICATION_HISTORY_PORT when PUB_SERVICE_URL is not set;
+ * otherwise the real HTTP adapter (PubPublicationHistoryAdapter) is used.
  *
  * Behaviour:
  *   - `latest()` returns empty Map (no publications is coherent for most projects).
  *   - `history()` returns empty array.
  *   - `signedDownloadUrl()` returns a stub placeholder URL with a far-future expiry.
- *   - Logs WARN on every call to signal degraded-mode operation (D-480).
+ *   - Logs WARN on every call to signal degraded-mode operation.
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: this file is the stub; the real HTTP client is in infrastructure/proj/read/.
+ * The real HTTP client is in infrastructure/proj/read/.
  */
 
 import { Logger } from '@nestjs/common';

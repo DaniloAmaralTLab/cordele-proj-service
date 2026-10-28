@@ -2,8 +2,8 @@
  * Domain event emitted after a ProjetoEditorial and its full LGPD erasure
  * cascade (PUB → COMP → IMP → DB delete) are committed.
  *
- * Pure domain type — no @nestjs/* or @prisma/client imports (RULE-01 / RULE-02).
- * Emitted by DeleteProjetoUseCase (P6 / PROJ-016) only after every erasure
+ * Pure domain type — no @nestjs/* or @prisma/client imports.
+ * Emitted by DeleteProjetoUseCase only after every erasure
  * step succeeds and the projeto_editorial row is deleted.
  */
 export class ProjectDeletedEvent {

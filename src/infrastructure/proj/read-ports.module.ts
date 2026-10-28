@@ -4,21 +4,16 @@
  *
  * Follows the same @Global() pattern as PersistenceModule: the providers
  * are registered here and injected anywhere without importing this module
- * directly from feature modules (RULE-04 compliance).
+ * directly from feature modules.
  *
  * Token imports come from the domain port files — infrastructure/ is allowed
- * to import domain/ (RULE-05 bars modules/ → infrastructure/ only, not the
- * reverse, and allows infrastructure/ → domain/).
+ * to import domain/; only the modules/ ↔ infrastructure/ directions are barred.
  *
- * P4 Fase 3 (PROJ-INT-001..003): IMP/COMP/PUB are now scaffolded, so each port
- * resolves to its real HTTP adapter when the sibling service URL
+ * Each port resolves to its real HTTP adapter when the sibling service URL
  * (IMP_SERVICE_URL / COMP_SERVICE_URL / PUB_SERVICE_URL) is configured, and
- * falls back to the PROJ-009 in-memory stub otherwise (local/dev/test without
+ * falls back to the in-memory stub otherwise (local/dev/test without
  * the sibling service running). Both branches never throw — the use cases'
- * degraded-mode handling (SPEC-07) is unaffected by which branch is active.
- *
- * RULE-04: modules/ must not import infrastructure/ directly.
- * RULE-05: infrastructure/ must not import modules/. ✓ (tokens from domain/)
+ * degraded-mode handling is unaffected by which branch is active.
  */
 
 import { Global, Module } from '@nestjs/common';
@@ -55,7 +50,7 @@ import { PubPublicationHistoryAdapter } from './read/publication-history.adapter
     PublicationHistoryStub,
 
     /**
-     * PROJ-INT-001: ManuscriptSummaryPort → ImpManuscriptSummaryAdapter when
+     * ManuscriptSummaryPort → ImpManuscriptSummaryAdapter when
      * IMP_SERVICE_URL is configured; ManuscriptSummaryStub otherwise.
      */
     {
@@ -69,7 +64,7 @@ import { PubPublicationHistoryAdapter } from './read/publication-history.adapter
     },
 
     /**
-     * PROJ-INT-002: ProjectMetadataPort → CompProjectMetadataAdapter when
+     * ProjectMetadataPort → CompProjectMetadataAdapter when
      * COMP_SERVICE_URL is configured; ProjectMetadataStub otherwise.
      */
     {
@@ -83,7 +78,7 @@ import { PubPublicationHistoryAdapter } from './read/publication-history.adapter
     },
 
     /**
-     * PROJ-INT-003: PublicationHistoryPort → PubPublicationHistoryAdapter when
+     * PublicationHistoryPort → PubPublicationHistoryAdapter when
      * PUB_SERVICE_URL is configured; PublicationHistoryStub otherwise.
      */
     {
@@ -104,7 +99,7 @@ import { PubPublicationHistoryAdapter } from './read/publication-history.adapter
      * waiting for a thrown error (stubs return valid defaults, never throw).
      *
      * Each factory re-evaluates the same ConfigService condition used above so
-     * the flag is always consistent with the port binding (SPEC-07 fix).
+     * the flag is always consistent with the port binding.
      */
     {
       provide: MANUSCRIPT_SUMMARY_IS_STUB,

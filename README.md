@@ -1,40 +1,50 @@
 # Cordelê — proj-service
 
-Part of **Cordelê**, a B2B platform that turns manuscripts (DOCX / Markdown)
-into valid ePub publications. The platform is split into four NestJS services:
+Serviço de projetos do **Cordelê**, uma plataforma B2B que transforma manuscritos (DOCX / Markdown) em
+ePub válidos. A plataforma tem quatro serviços NestJS:
 
-| Service | Responsibility |
+| Serviço | Responsabilidade |
 |---|---|
-| imp-service  | Import DOCX/Markdown into a structured content tree; curation of unparsed segments |
-| comp-service | Editorial metadata, layout configuration, cover, preview |
-| pub-service  | Assemble and validate the ePub; publication history |
-| proj-service | Editorial project lifecycle and status |
+| imp-service  | Importa DOCX/Markdown para uma árvore de conteúdo; curadoria de trechos não reconhecidos |
+| comp-service | Metadados editoriais, layout, capa, pré-visualização |
+| pub-service  | Monta e valida o ePub; histórico de publicações |
+| proj-service | Ciclo de vida e status do projeto editorial |
 
-This repository contains **proj-service**. Contracts of the services it talks to live
-under `docs/services/*/contracts/`.
+Este repositório tem só o **proj-service**. Os contratos e specs dele estão em
+`docs/services/proj-service/`; os outros serviços ficam em outros repositórios.
 
-## Layout
+## Estrutura
 
 ```
-src/modules/          NestJS feature modules: controllers, DTOs, use cases
-src/domain/           entities, value objects, ports — no framework imports
-src/infrastructure/   Prisma repositories, HTTP adapters, auth
-prisma/               schema and migrations
-docs/                 service spec, contracts, ADRs, standards, issues
+src/modules/          módulos Nest: controllers, DTOs, casos de uso
+src/domain/           entidades, value objects, portas — sem imports de framework
+src/infrastructure/   repositórios Prisma, adapters HTTP, auth
+prisma/               schema e migrations
+docs/                 contratos e specs do serviço
 ```
 
-## Development (Node 22)
+## Desenvolvimento (Node 22)
 
 ```bash
 npm install
 npm run prisma:generate
-npm test              # Jest unit tests
+npm test              # testes unitários (Jest), não precisam de banco
 npm run typecheck
-npm run lint          # includes the hexagonal boundary rules
+npm run lint          # inclui as regras de fronteira entre camadas
 ```
 
-Running the service needs PostgreSQL and an OIDC provider; see `.env.example`.
+Para subir o serviço:
 
-## License
+```bash
+cp .env.example .env
+npm run prisma:migrate   # aplica as migrations no PostgreSQL do DATABASE_URL
+npm run start:dev
+```
 
-MIT — see [LICENSE](LICENSE).
+Precisa de PostgreSQL 16 e de um provedor OIDC (Keycloak no ambiente local). O schema da empresa é
+escolhido em tempo de execução a partir do token. As variáveis `*_SERVICE_URL` apontam para os outros
+serviços; sem elas o serviço sobe com implementações vazias e as leituras saem marcadas como degradadas.
+
+## Licença
+
+MIT — ver [LICENSE](LICENSE).

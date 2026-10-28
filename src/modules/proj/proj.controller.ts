@@ -69,20 +69,18 @@ import { IllegalStatusTransitionError } from '../../domain/proj/errors/illegal-s
 /**
  * HTTP adapter for the PROJ (Projetos Editoriais) bounded context.
  *
- * P4 update: the four read endpoints (GET /projetos, GET /projetos/:id,
+ * The four read endpoints (GET /projetos, GET /projetos/:id,
  * GET /projetos/:id/publicacoes, GET /projetos/:id/publicacoes/:pid/download)
- * are now wired to their respective use cases. The PROJ-009 port stubs provide
- * in-memory fallback data; degraded=true is surfaced when any port throws.
+ * delegate to their respective use cases; degraded=true is surfaced when any
+ * cross-context read port fails.
  *
- * P5 update (PROJ-014): every handler now takes `@CurrentUser()`, resolving
+ * Every handler takes `@CurrentUser()`, resolving
  * `empresaId` exclusively from the JWT claim (never from body/path/query).
  * `JwtAuthGuard` is registered globally via `APP_GUARD` in `app.module.ts`
  * (mirroring imp-service), so it protects every route below without this
  * file importing anything from `infrastructure/`. `@RequiredScopes()` (also
  * declared in `modules/proj/decorators/`) enforces the OAuth2 scope per
  * route: `proj:read` for reads, `proj:write` for mutations.
- *
- * RULE-04: this file is in modules/ and must NOT import from infrastructure/.
  */
 @ApiTags('projetos')
 @ApiBearerAuth('bearer')
@@ -117,7 +115,7 @@ export class ProjController {
   ) {}
 
   // ---------------------------------------------------------------------------
-  // 4.1  POST /api/v1/proj/projetos — create an editorial project
+  // POST /api/v1/proj/projetos — create an editorial project
   // ---------------------------------------------------------------------------
 
   @Post('projetos')
@@ -151,7 +149,7 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.2  GET /api/v1/proj/projetos — project library (T02)
+  // GET /api/v1/proj/projetos — project library
   // ---------------------------------------------------------------------------
 
   @Get('projetos')
@@ -167,7 +165,7 @@ export class ProjController {
     name: 'X-Degraded',
     description:
       'Present and set to "true" when one or more cross-context read ports ' +
-      'are operating in stub/fallback mode (SPEC-07). Response body shape is ' +
+      'are operating in stub/fallback mode. Response body shape is ' +
       'unchanged — cards contain safe defaults (0 counts, null autor).',
     required: false,
     schema: { type: 'string', enum: ['true'] },
@@ -248,7 +246,7 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.3  GET /api/v1/proj/projetos/:projetoId — project detail
+  // GET /api/v1/proj/projetos/:projetoId — project detail
   // ---------------------------------------------------------------------------
 
   @Get('projetos/:projetoId')
@@ -274,12 +272,12 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.4  GET /api/v1/proj/projetos/:projetoId/publicacoes — publication history (T08)
+  // GET /api/v1/proj/projetos/:projetoId/publicacoes — publication history
   // ---------------------------------------------------------------------------
 
   @Get('projetos/:projetoId/publicacoes')
   @RequiredScopes('proj:read')
-  @ApiOperation({ summary: 'List publications for a project (T08)' })
+  @ApiOperation({ summary: 'List publications for a project' })
   @ApiOkResponse({
     type: [PublicacaoHistoryItemDto],
     description: 'Publication history list, newest first.',
@@ -296,7 +294,7 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.5  GET /api/v1/proj/projetos/:projetoId/publicacoes/:publicacaoId/download
+  // GET /api/v1/proj/projetos/:projetoId/publicacoes/:publicacaoId/download
   // ---------------------------------------------------------------------------
 
   @Get('projetos/:projetoId/publicacoes/:publicacaoId/download')
@@ -324,7 +322,7 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.6  DELETE /api/v1/proj/projetos/:projetoId — LGPD erasure (D-G)
+  // DELETE /api/v1/proj/projetos/:projetoId — LGPD erasure
   // ---------------------------------------------------------------------------
 
   @Delete('projetos/:projetoId')
@@ -351,7 +349,7 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.7  POST /api/v1/proj/projetos/:projetoId/reopen — reopen for a new revision (G6)
+  // POST /api/v1/proj/projetos/:projetoId/reopen — reopen for a new revision
   // ---------------------------------------------------------------------------
 
   @Post('projetos/:projetoId/reopen')
@@ -391,8 +389,8 @@ export class ProjController {
   /**
    * Maps the domain-level `IllegalStatusTransitionError` (thrown by
    * `ProjectStatusVO.reopen` for a `rascunho` project) onto the HTTP 409
-   * documented in api-contract §4.7 / §7. The use case stays framework-free
-   * (RULE-01/02); only this HTTP adapter knows about `ConflictException`.
+   * documented in api-contract §4.7 / §7. The use case stays framework-free;
+   * only this HTTP adapter knows about `ConflictException`.
    */
   private async reopenProjeto(
     projetoId: string,
@@ -414,7 +412,7 @@ export class ProjController {
   }
 
   // ---------------------------------------------------------------------------
-  // 4.8  POST /api/v1/proj/projetos/:projetoId/advance-status — advance status (G4/INT-PUB-003)
+  // POST /api/v1/proj/projetos/:projetoId/advance-status — advance status
   // ---------------------------------------------------------------------------
 
   @Post('projetos/:projetoId/advance-status')
@@ -441,10 +439,8 @@ export class ProjController {
 
   /**
    * Maps `IllegalStatusTransitionError` (domain) onto HTTP 409 for the
-   * advance-status route (§4.8 / api-contract §7). Same pattern as
+   * advance-status route (api-contract §4.8 / §7). Same pattern as
    * `reopenProjeto` above.
-   *
-   * RULE-04: stays in modules/; only this adapter touches `ConflictException`.
    */
   private async callAdvanceStatus(
     projetoId: string,

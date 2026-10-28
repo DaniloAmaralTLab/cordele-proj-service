@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ProjetoCardDto } from './projeto-card.dto';
 
 /**
- * Paginated response envelope for the project library endpoint (T02).
+ * Paginated response envelope for the project library endpoint.
  *
  * The envelope is preferred over a flat array + header for cursor pagination
  * because `nextCursor` is a first-class part of the read contract — it is not
@@ -12,9 +12,6 @@ import { ProjetoCardDto } from './projeto-card.dto';
  *  - Lets typed clients (generated from OpenAPI) access the cursor without
  *    inspecting HTTP headers.
  *  - Follows the convention used by IMP, COMP and PUB batch endpoints.
- *
- * The FE `projeto-api.service.ts` must be updated to parse the envelope
- * (previously it expected a raw ProjetoCard[] array).
  */
 export class ProjetoLibraryPageDto {
   @ApiProperty({

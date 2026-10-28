@@ -3,14 +3,12 @@
  *
  * Calls COMP service's internal erasure endpoint to purge all composition
  * data for a project. Registered under COMPOSITION_ERASURE_PORT when
- * COMP_SERVICE_URL is configured (env-flag switch in erasure-ports.module.ts —
- * PROJ-INT-005).
+ * COMP_SERVICE_URL is configured (env-flag switch in erasure-ports.module.ts).
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: this is the correct place for outbound HTTP clients.
+ * Outbound HTTP clients live in infrastructure/; no modules/ imports.
  *
  * Error handling: must not degrade silently — an unreachable COMP or a
- * non-2xx response throws, so DeleteProjetoUseCase (PROJ-016) aborts the
+ * non-2xx response throws, so DeleteProjetoUseCase aborts the
  * cascade before IMP purge and the DB delete run.
  */
 

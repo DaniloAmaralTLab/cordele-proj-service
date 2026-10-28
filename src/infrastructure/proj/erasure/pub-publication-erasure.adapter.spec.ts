@@ -1,7 +1,7 @@
 /**
- * Unit tests for PubPublicationErasureAdapter (PROJ-INT-006).
+ * Unit tests for PubPublicationErasureAdapter.
  *
- * Unlike the P4 read adapters, this adapter must NOT degrade silently — every
+ * Unlike the read adapters, this adapter must NOT degrade silently — every
  * failure path (missing config, non-2xx, network error) must throw so the
  * caller (DeleteProjetoUseCase) aborts the LGPD erasure cascade.
  */
@@ -46,7 +46,7 @@ describe('PubPublicationErasureAdapter', () => {
 
   it('resolves (idempotent) when project has no publications — PUB returns 204 no-op', async () => {
     // PUB is idempotent: when there are no publications for the project it returns 204 (safe no-op).
-    // The adapter must complete without error so the LGPD cascade (PROJ-016) can proceed.
+    // The adapter must complete without error so the LGPD cascade can proceed.
     // PUB erasure is the first step (leaf before COMP and IMP) — must not block the cascade.
     mockFetch.mockResolvedValue({ ok: true, status: 204 });
 

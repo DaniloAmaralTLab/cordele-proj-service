@@ -6,10 +6,10 @@
  *
  * This is NOT a unit test — it boots a real NestJS HTTP application via
  * @nestjs/testing + supertest and makes actual HTTP requests so the full Nest
- * request pipeline (guards → interceptors → handler) runs exactly as in production.
+ * request lifecycle (guards → interceptors → handler) runs exactly as in production.
  *
  * Uses the REAL EmpresaContextStore from this same directory — the identical store
- * that JwtAuthGuard.canActivate() populates at line 106 of jwt.guard.ts.
+ * that EmpresaContextInterceptor populates in production.
  *
  * Scenarios
  * ──────────
@@ -20,8 +20,8 @@
  *     (comp-service approach) — injected provider reads
  *
  *  5. PRODUCTION-ACCURATE: async guard does `await` THEN enterWith() → injected
- *     provider reads. Replicates JwtAuthGuard.canActivate() topology exactly:
- *     `await super.canActivate(context)` at line 91, then enterWith() at line 106.
+ *     provider reads. Same topology as an async JwtAuthGuard.canActivate():
+ *     `await super.canActivate(context)`, then enterWith().
  *     enterWith() here runs in an async-child resource (Promise continuation),
  *     not in the original request resource. Does context propagate to the handler?
  *
@@ -35,8 +35,8 @@
  *  throws "invoked outside an AsyncLocalStorage context"). The test asserts 200,
  *  so any missing propagation yields an unmistakable failure.
  *
- * RULE-08: no console.log — results via Jest assertions only.
- * RULE-04/05: spec lives in infrastructure/context/ — no modules/ imports.
+ * No console.log — results via Jest assertions only.
+ * The spec lives in infrastructure/context/ — no modules/ imports.
  */
 
 import {
@@ -316,26 +316,14 @@ describe('ALS enterWith() context propagation through the NestJS pipeline', () =
       // resource. In an async guard, `await Promise.resolve()` (or the real
       // `await super.canActivate()`) creates a new child async resource for the
       // continuation. enterWith() sets the store on that child. But the NestJS
-      // pipeline awaits the guard's Promise from a DIFFERENT continuation — one
+      // request lifecycle awaits the guard's Promise from a DIFFERENT continuation — one
       // that is a child of the original request resource, not of the guard's
-      // internal child. That pipeline continuation and all its descendants (the
+      // internal child. That continuation and all its descendants (the
       // handler, the injected provider) do not see the store.
       //
-      // IMPACT ON PROJ-SERVICE: JwtAuthGuard.canActivate() is async and calls
-      // `await super.canActivate(context)` at line 91 before calling
-      // EmpresaContextStore.enterWith() at line 106. This is EXACTLY the failing
-      // topology. ProjetoEditorialLookupAdapter.exists() will throw
-      // "invoked outside an AsyncLocalStorage context" when the lookup port is
-      // exposed. The gate cross-tenant is currently safe only because that path
-      // is unreachable (no controller consumes the port yet).
-      //
-      // FIX (NOT applied in this task — scope is measurement only): replace
-      // enterWith() in JwtAuthGuard with an APP_INTERCEPTOR that wraps
-      // next.handle() in EmpresaContextStore.run(), following the comp-service
-      // pattern (scenario 6 below confirms it works).
-      //
-      // This assertion documents the BROKEN state as a regression sentinel:
-      // if it changes to 200 in the future the fix has been applied, update it.
+      // This is why the service sets the context in an APP_INTERCEPTOR via
+      // store.run() (scenario 6) rather than in the guard. The assertion pins
+      // the observed behaviour of enterWith() after an await.
       expect(res.status).toBe(500);
     });
   });

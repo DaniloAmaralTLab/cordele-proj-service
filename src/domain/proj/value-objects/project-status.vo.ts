@@ -1,8 +1,8 @@
 /**
  * ProjetoStatus value object — the sole authority on legal status transitions
- * for a ProjetoEditorial (ADR-002 / api-contract §7).
+ * for a ProjetoEditorial (api-contract §7).
  *
- * Pure domain code: zero @nestjs/* and zero @prisma/client imports (RULE-01 / RULE-02).
+ * Pure domain code: zero @nestjs/* and zero @prisma/client imports.
  * The controller and application service NEVER re-encode transition rules; they
  * delegate entirely to this VO.
  *
@@ -22,7 +22,7 @@
 
 import { IllegalStatusTransitionError } from '../errors/illegal-status-transition.error';
 
-/** Fixed status set for ProjetoEditorial (doc 06 A6). */
+/** Fixed status set for ProjetoEditorial. */
 export enum ProjetoStatus {
   rascunho = 'rascunho',
   em_composicao = 'em_composicao',
@@ -47,7 +47,7 @@ export class ProjectStatusVO {
    * Idempotent: `advanceTo(X, X)` returns `{ newStatus: X, changed: false }` for
    * any status that is a valid target without throwing. The IMP confirm-estrutura
    * flow in particular relies on `advanceTo(em_composicao, em_composicao)` being
-   * a safe no-op (SPEC-02 / SPEC-05).
+   * a safe no-op.
    *
    * @throws IllegalStatusTransitionError when the transition is not in the legal table.
    */

@@ -1,9 +1,8 @@
 -- =============================================================================
 -- Migration 0001: create_projeto_editorial
 -- Service:   proj-service
--- Source:    docs/architecture/backend/services/proj-service/contracts/data-model.md §2.1
 --
--- Creates the aggregate root table for the PROJ bounded context.
+-- Creates the main project table.
 -- This table is the cascade root: IMP/COMP/PUB declare FK (projeto_id)
 -- REFERENCES projeto_editorial(id) ON DELETE CASCADE in their own migrations.
 -- =============================================================================

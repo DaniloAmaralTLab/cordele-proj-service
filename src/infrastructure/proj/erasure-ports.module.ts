@@ -1,7 +1,7 @@
 /**
  * ErasurePortsModule — global provider module for the three outbound erasure
  * ports (PublicationErasurePort, CompositionErasurePort, ManuscriptErasurePort)
- * used by the LGPD delete cascade (P6 / PROJ-015).
+ * used by the LGPD delete cascade.
  *
  * Follows the same @Global() pattern as ReadPortsModule: each port resolves
  * to its real HTTP adapter when the sibling service URL is configured
@@ -9,8 +9,8 @@
  * the in-memory stub otherwise (local/dev/test without the sibling service
  * running).
  *
- * RULE-04: modules/ must not import infrastructure/ directly.
- * RULE-05: infrastructure/ must not import modules/. ✓ (tokens from domain/)
+ * Tokens come from domain/, so modules/ never imports infrastructure/ and
+ * infrastructure/ never imports modules/.
  */
 
 import { Global, Module } from '@nestjs/common';
@@ -40,7 +40,7 @@ import { ImpManuscriptErasureAdapter } from './erasure/imp-manuscript-erasure.ad
     ManuscriptErasureStub,
 
     /**
-     * PROJ-INT-006: PublicationErasurePort → PubPublicationErasureAdapter when
+     * PublicationErasurePort → PubPublicationErasureAdapter when
      * PUB_SERVICE_URL is configured; PublicationErasureStub otherwise.
      */
     {
@@ -54,7 +54,7 @@ import { ImpManuscriptErasureAdapter } from './erasure/imp-manuscript-erasure.ad
     },
 
     /**
-     * PROJ-INT-005: CompositionErasurePort → CompCompositionErasureAdapter when
+     * CompositionErasurePort → CompCompositionErasureAdapter when
      * COMP_SERVICE_URL is configured; CompositionErasureStub otherwise.
      */
     {
@@ -68,7 +68,7 @@ import { ImpManuscriptErasureAdapter } from './erasure/imp-manuscript-erasure.ad
     },
 
     /**
-     * PROJ-INT-004: ManuscriptErasurePort → ImpManuscriptErasureAdapter when
+     * ManuscriptErasurePort → ImpManuscriptErasureAdapter when
      * IMP_SERVICE_URL is configured; ManuscriptErasureStub otherwise.
      */
     {

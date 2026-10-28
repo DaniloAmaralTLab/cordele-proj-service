@@ -2,16 +2,14 @@
  * ReopenProjectForRevisionUseCase — the sole deliberate backward edge.
  *
  * Triggered by the editor via `POST /api/proj/projetos/{projetoId}/reopen`
- * (T08 "Ajustar metadados/layout" button). Only the editor may call this;
- * IMP and PUB must use AdvanceProjetoStatusUseCase (ADR-002 / D-D).
+ * ("Ajustar metadados/layout" button on the detail/history screen). Only the
+ * editor may call this; IMP and PUB must use AdvanceProjetoStatusUseCase.
  *
- * Business rules (api-contract §4.7 / §7 / SPEC-02):
+ * Business rules (api-contract §4.7 / §7):
  *   - Delegates to ProjectStatusVO.reopen for validation.
  *   - publicado|com_erros → em_composicao: persists + emits ProjectStatusChanged.
  *   - Already em_composicao: returns { changed: false } (idempotent no-op).
  *   - rascunho: throws IllegalStatusTransitionError (→ 409 over REST).
- *
- * RULE-04: this file is in modules/ and does NOT import from infrastructure/.
  */
 
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
@@ -66,8 +64,7 @@ export class ReopenProjectForRevisionUseCase {
       return { projetoId: projeto.id, newStatus, changed: false };
     }
 
-    // Persist the status change (P3 will also append projeto_status_historico
-    // with solicitado_por=editor).
+    // Persist the status change.
     await this.repository.updateStatus({
       id: projeto.id,
       newStatus,
@@ -76,7 +73,7 @@ export class ReopenProjectForRevisionUseCase {
       empresaId: user.empresaId,
     });
 
-    // Emit ProjectStatusChanged post-persist (solicitadoPor=editor per SPEC-02).
+    // Emit ProjectStatusChanged post-persist (solicitadoPor=editor).
     const event = new ProjectStatusChangedEvent({
       eventId: randomUUID(),
       occurredAt: new Date().toISOString(),

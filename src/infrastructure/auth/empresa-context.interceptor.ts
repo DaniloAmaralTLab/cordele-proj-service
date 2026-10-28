@@ -34,8 +34,7 @@ import { EmpresaContextStore } from '../context/empresa.context';
  * `AuthGuard('jwt')` verifies the RS256/JWKS JWT signature and `resolveTenant`
  * applies the optional `x-tenant-id` header override. This interceptor runs AFTER
  * the guard (NestJS lifecycle: Middleware → Guard → Interceptor → Handler), so
- * `request.user.empresaId` is always from a cryptographically verified source
- * (RULE-07 compliant).
+ * `request.user.empresaId` is always from a cryptographically verified source.
  *
  * Routes marked `@Public()` receive no `request.user`; the interceptor passes them
  * through without setting any ALS context.
@@ -44,11 +43,10 @@ import { EmpresaContextStore } from '../context/empresa.context';
  *
  * Registered globally as `APP_INTERCEPTOR` in `AppModule` (composition root) so
  * every authenticated route gets empresa context without `ProjModule` importing
- * `infrastructure/` directly (RULE-04 compliant).
+ * `infrastructure/` directly.
  *
  * @see src/infrastructure/context/empresa.context.ts
  * @see src/infrastructure/context/als-guard-propagation.spec.ts
- * @see docs/architecture/shared/multi-empresa.md
  */
 @Injectable()
 export class EmpresaContextInterceptor implements NestInterceptor {

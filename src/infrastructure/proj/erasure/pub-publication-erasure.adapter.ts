@@ -3,15 +3,13 @@
  *
  * Calls PUB service's internal erasure endpoint to purge all publication data
  * for a project. Registered under PUBLICATION_ERASURE_PORT when
- * PUB_SERVICE_URL is configured (env-flag switch in erasure-ports.module.ts —
- * PROJ-INT-006).
+ * PUB_SERVICE_URL is configured (env-flag switch in erasure-ports.module.ts).
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: this is the correct place for outbound HTTP clients.
+ * Outbound HTTP clients live in infrastructure/; no modules/ imports.
  *
- * Error handling: unlike the P4 read adapters, this adapter MUST NOT degrade
+ * Error handling: unlike the read adapters, this adapter MUST NOT degrade
  * silently — an unreachable PUB or a non-2xx response throws, so
- * DeleteProjetoUseCase (PROJ-016) aborts the cascade before COMP/IMP purge
+ * DeleteProjetoUseCase aborts the cascade before COMP/IMP purge
  * and the DB delete run (contract: "falha em PUB nao deleta").
  */
 

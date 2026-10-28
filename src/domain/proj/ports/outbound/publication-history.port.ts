@@ -7,9 +7,8 @@
  *   3. `signedDownloadUrl(publicacaoId)` — obtains a short-TTL signed URL for a
  *      specific publication (only called when epubcheckStatus is valido|avisos).
  *
- * RULE-01: zero @prisma/client imports.
- * RULE-02: zero @nestjs/* imports.
- * RULE-06: the real HTTP adapter lives in src/infrastructure/proj/read/.
+ * Zero @prisma/client and @nestjs/* imports. The HTTP adapter lives in
+ * src/infrastructure/proj/read/.
  */
 
 /** One publication record from PUB (read-projection). */
@@ -45,8 +44,8 @@ export interface SignedDownloadUrlResult {
  * Port interface for reading publication history from PUB.
  *
  * Implementations:
- *  - Stub (P4): src/infrastructure/stubs/proj/publication-history.stub.ts
- *  - Real HTTP adapter (PROJ-INT-003): src/infrastructure/proj/read/publication-history.adapter.ts
+ *  - In-memory stub: src/infrastructure/stubs/proj/publication-history.stub.ts
+ *  - HTTP adapter: src/infrastructure/proj/read/publication-history.adapter.ts
  */
 export interface PublicationHistoryPort {
   /**
@@ -76,7 +75,7 @@ export interface PublicationHistoryPort {
   /**
    * Returns a short-TTL signed URL for downloading the ePub artifact.
    * The PORT itself does not enforce the epubcheck status guard —
-   * GetSignedDownloadUrlUseCase (PROJ-013) is responsible for the 409 check
+   * GetSignedDownloadUrlUseCase is responsible for the 409 check
    * before calling this method.
    *
    * @param publicacaoId - UUID of the specific publication

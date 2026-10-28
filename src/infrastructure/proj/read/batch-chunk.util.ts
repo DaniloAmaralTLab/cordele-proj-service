@@ -3,7 +3,7 @@
  *
  * CROSS_SERVICE_BATCH_LIMIT is a contractual limit agreed with all three
  * downstream batch endpoints (IMP, COMP, PUB). Requests exceeding this limit
- * receive HTTP 400. The limit is documented in each service's api-contract.md.
+ * receive HTTP 400. The limit is documented in each service's API contract.
  *
  * Keeping the constant here — rather than as a magic literal in each adapter —
  * makes the origin of the value visible and ensures a single point of change

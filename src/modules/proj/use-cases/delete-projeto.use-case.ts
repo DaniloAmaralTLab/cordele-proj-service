@@ -1,8 +1,7 @@
 /**
- * DeleteProjetoUseCase — orchestrates the LGPD erasure cascade for a project
- * (P6 / PROJ-016).
+ * DeleteProjetoUseCase — orchestrates the LGPD erasure cascade for a project.
  *
- * Business rules (plan §P6 / contract):
+ * Business rules:
  *   - Purge order is PUB → COMP → IMP → DB delete, strictly sequential
  *     (NOT Promise.all) — each step must complete before the next starts.
  *   - Abort-on-failure: the first port that throws stops the cascade; the
@@ -14,8 +13,6 @@
  *     without error — this use case does not need special-case retry logic,
  *     it simply re-runs the full sequence.
  *   - Emits ProjectDeleted post-commit, only after the DB delete succeeds.
- *
- * RULE-04: this file is in modules/ and must NOT import from infrastructure/.
  */
 
 import {

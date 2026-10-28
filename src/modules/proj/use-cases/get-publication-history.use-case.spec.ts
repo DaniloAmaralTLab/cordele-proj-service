@@ -1,5 +1,5 @@
 /**
- * Unit tests for GetPublicationHistoryUseCase (PROJ-012).
+ * Unit tests for GetPublicationHistoryUseCase.
  */
 
 import { NotFoundException } from '@nestjs/common';

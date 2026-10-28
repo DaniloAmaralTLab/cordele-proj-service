@@ -50,9 +50,9 @@ function toData(row: PrismaProjetoRow, _empresaId: string): ProjetoEditorialData
  *
  * Implements ProjetoEditorialRepositoryPort using Prisma + schema-per-tenant.
  *
- * RULE-01: zero @prisma/client in domain.
- * RULE-05: infrastructure does not import modules/.
- * RULE-07: every operation resolves the tenant schema via TenantPrismaFactory.withTenant()
+ * No @prisma/client in domain.
+ * infrastructure does not import modules/.
+ * Every operation resolves the tenant schema via TenantPrismaFactory.withTenant()
  *   which executes `SET LOCAL search_path TO emp_{slug}, public` inside the
  *   transaction. Cross-tenant isolation is physical: empresa A's schema never
  *   contains empresa B's rows.
@@ -146,7 +146,7 @@ export class PrismaProjetoEditorialRepository
    * Error — the caller (use case or controller) is responsible for catching this
    * and returning HTTP 400 to the client.
    *
-   * RULE-08: no $queryRaw — keyset pagination is expressed via Prisma where clauses.
+   * No $queryRaw — keyset pagination is expressed via Prisma where clauses.
    */
   async findAll(
     empresaId: string,
@@ -227,7 +227,7 @@ export class PrismaProjetoEditorialRepository
   }
 
   /**
-   * Atomically advances the status of a ProjetoEditorial — PROJ-004 TOCTOU fix.
+   * Atomically advances the status of a ProjetoEditorial (no check-then-act race).
    *
    * Within a single Prisma $transaction (via TenantPrismaFactory.withTenant):
    *   1. SELECT ... FOR UPDATE acquires a row-level lock BEFORE reading status.
@@ -238,7 +238,7 @@ export class PrismaProjetoEditorialRepository
    *   3. Only on a real change: UPDATE projeto_editorial + INSERT historico
    *      in the same transaction. Lock released on commit.
    *
-   * RULE-08: $queryRaw is used here (a repository method) — not in modules/.
+   * $queryRaw is used here (a repository method) — not in modules/.
    * Infrastructure importing domain (ProjectStatusVO) is the correct direction.
    */
   async advanceStatusAtomic(
@@ -317,7 +317,7 @@ export class PrismaProjetoEditorialRepository
 
   /**
    * Hard-deletes a ProjetoEditorial; ON DELETE CASCADE removes history rows.
-   * Used only by the LGPD erasure use case (P6 / PROJ-015).
+   * Used only by the LGPD erasure use case.
    */
   async delete(id: string, empresaId: string): Promise<void> {
     await this.tenantFactory.withTenant(empresaId, async (tx) => {

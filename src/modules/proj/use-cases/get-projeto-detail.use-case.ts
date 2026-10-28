@@ -1,13 +1,11 @@
 /**
  * GetProjetoDetailUseCase — returns one ProjetoEditorial with all cross-context
- * fields composed from IMP, COMP and PUB (SPEC-03 clause 4).
+ * fields composed from IMP, COMP and PUB.
  *
  * Invariants:
- *  - `status` is ALWAYS taken from PROJ's own row (authority per ADR-002).
+ *  - `status` is ALWAYS taken from PROJ's own row (PROJ owns the status).
  *  - Cross-context fields degrade gracefully (null / []) when any port throws.
  *  - Cross-tenant projetoId returns null (maps to 404 at the controller).
- *
- * RULE-04: this file is in modules/ and must NOT import from infrastructure/.
  */
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -67,7 +65,7 @@ export class GetProjetoDetailUseCase {
     }
 
     // Pre-set degraded when any port resolved to its stub adapter at startup
-    // (stubs return valid defaults but never throw — SPEC-07 fix, Problem 3a).
+    // (stubs return valid defaults but never throw).
     let degraded = this.manuscriptIsStub || this.metadataIsStub || this.historyIsStub;
     const markDegraded = () => { degraded = true; };
 

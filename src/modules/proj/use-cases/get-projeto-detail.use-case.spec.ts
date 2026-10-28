@@ -1,12 +1,12 @@
 /**
- * Unit tests for GetProjetoDetailUseCase (PROJ-011).
+ * Unit tests for GetProjetoDetailUseCase.
  *
  * Verified behaviours:
  *  1. Happy path: all cross-context fields composed correctly.
  *  2. Returns null for unknown/cross-tenant project → controller maps to 404.
  *  3. degraded=true and publicationHistory=[] when PUB port throws.
  *  4. status always from PROJ own row, regardless of cross-context data.
- *  5. WARN emitted with degraded:true port=<PortName> when any port degrades (PROJ-017).
+ *  5. WARN emitted with degraded:true port=<PortName> when any port degrades.
  */
 
 import { Logger } from '@nestjs/common';
@@ -59,7 +59,7 @@ describe('GetProjetoDetailUseCase', () => {
     } as jest.Mocked<PublicationHistoryPort>;
 
     // All three stub-mode flags are false — ports resolve to the mocked real
-    // adapters, so degraded starts at false (SPEC-07 stub-mode fix).
+    // adapters, so degraded starts at false.
     useCase = new GetProjetoDetailUseCase(
       repository,
       manuscriptPort,
@@ -136,7 +136,7 @@ describe('GetProjetoDetailUseCase', () => {
   });
 
   it('status always present in response even when ManuscriptSummaryPort degrades', async () => {
-    // SPEC-10 invariant: own PROJ fields (id, status, nome) are always returned
+    // Invariant: own PROJ fields (id, status, nome) are always returned
     // regardless of cross-context port availability.
     repository.findById.mockResolvedValue(makeProject(ProjetoStatus.publicado));
     manuscriptPort.summaries.mockRejectedValue(new Error('IMP unavailable'));
@@ -153,10 +153,10 @@ describe('GetProjetoDetailUseCase', () => {
   });
 
   // ---------------------------------------------------------------------------
-  // PROJ-017: structured WARN log on degraded port (observability)
+  // Structured WARN log on degraded port (observability)
   // ---------------------------------------------------------------------------
 
-  describe('degraded WARN logging (PROJ-017)', () => {
+  describe('degraded WARN logging', () => {
     let loggerWarnSpy: jest.SpiedFunction<typeof Logger.prototype.warn>;
 
     beforeEach(() => {
@@ -236,7 +236,7 @@ describe('GetProjetoDetailUseCase', () => {
   // Real-adapter degradation path (Problem 1 fix)
   // ---------------------------------------------------------------------------
 
-  describe('real-adapter degradation (Problem 1 fix)', () => {
+  describe('real-adapter degradation', () => {
     it('returns degraded=true when real adapter throws (simulated non-OK HTTP response)', async () => {
       repository.findById.mockResolvedValue(makeProject());
       // Simulate real IMP adapter throwing because IMP returned 404 (not returning empty Map)

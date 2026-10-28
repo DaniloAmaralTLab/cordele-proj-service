@@ -3,11 +3,10 @@
  *
  * Queries the IMP context for manuscript summaries of a given list of projects.
  * Called once per library/detail request with ALL projetoIds — this is the
- * batching contract that prevents N+1 port calls (SPEC-10 clause 3).
+ * batching contract that prevents N+1 port calls.
  *
- * RULE-01: zero @prisma/client imports.
- * RULE-02: zero @nestjs/* imports.
- * RULE-06: the real HTTP adapter lives in src/infrastructure/proj/read/.
+ * Zero @prisma/client and @nestjs/* imports. The HTTP adapter lives in
+ * src/infrastructure/proj/read/.
  */
 
 /** Read model for one project's manuscript summary (sourced from IMP). */
@@ -22,8 +21,8 @@ export interface ManuscriptSummary {
  * Port interface for batch-reading manuscript summaries from IMP.
  *
  * Implementations:
- *  - Stub (P4): src/infrastructure/stubs/proj/manuscript-summary.stub.ts
- *  - Real HTTP adapter (PROJ-INT-001): src/infrastructure/proj/read/manuscript-summary.adapter.ts
+ *  - In-memory stub: src/infrastructure/stubs/proj/manuscript-summary.stub.ts
+ *  - HTTP adapter: src/infrastructure/proj/read/manuscript-summary.adapter.ts
  */
 export interface ManuscriptSummaryPort {
   /**

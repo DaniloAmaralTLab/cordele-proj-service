@@ -1,65 +1,52 @@
-# SPEC-02 — Project Lifecycle & Status Authority (core orchestration)
+# Ciclo de vida e status do projeto
 
-**Module:** PROJ · **Refs:** `contracts/api-contract.md` §7, `contracts/integration-contracts.md` §1.3–1.4,
-local `adr/ADR-002-project-status-authority.md`. EARS per `docs/architecture/backend/standards/ears-notation.md`.
+O PROJ é o único serviço que escreve o status de um projeto. IMP e PUB pedem mudanças pelo `advanceTo`;
+o editor reabre um projeto pelo `reopen`. As regras de transição ficam no value object de status
+(`ProjectStatus`), que é domínio puro; controller e adapters não repetem essas regras. A tabela completa
+está na seção 7 do contrato da API.
 
-## Objetivo
+O ponto central é a separação entre os dois caminhos: `advanceTo` só avança e é idempotente, porque é
+chamado automaticamente por IMP e PUB e pode ser repetido; `reopen` é a única forma de voltar
+(`publicado` ou `com_erros` para `em_composicao`), e é uma ação explícita do editor.
 
-Especificar a **autoridade de status** do projeto: a tabela de transições legais, a semântica de
-idempotência, o erro de transição ilegal, e a separação entre `advanceTo` (avanço/lateral, idempotente,
-para IMP/PUB) e `reopen` (a única aresta de regressão deliberada, para o editor — gap G6).
+## advanceTo({ projetoId, targetStatus })
 
-## Escopo
+1. Carregar o projeto na empresa de quem chamou. Se não existir, erro de não encontrado.
+2. Ler o status atual.
+3. Se o status pedido for igual ao atual: nada muda (`changed = false`) e nenhum evento sai.
+4. Se o status pedido for `em_composicao` e o atual for `publicado` ou `com_erros`: nada muda
+   (`changed = false`) e nenhum evento sai. Não é erro; o status simplesmente não volta.
+5. Se a transição estiver na tabela: aplicar, gravar, registrar no histórico (de, para, quem pediu) e
+   emitir `ProjectStatusChanged` (`changed = true`).
+6. Caso contrário: lançar `IllegalStatusTransitionError`.
 
-- **In:** `AdvanceProjetoStatusUseCase.advanceTo`, `ReopenProjectForRevisionUseCase.reopen`, o VO
-  `ProjectStatus` (tabela de transições), emissão de `ProjectStatusChanged`, auditoria em
-  `projeto_status_historico`.
-- **Out:** o que dispara a transição (IMP confirm-estrutura; PUB export) — vive nos respetivos contextos.
+Transições válidas pelo `advanceTo`: `rascunho → em_composicao`, `em_composicao → publicado`,
+`em_composicao → com_erros`, `publicado → com_erros` e `com_erros → publicado`.
 
-## Decisões técnicas
+O histórico e o evento registram quem pediu a mudança (`solicitadoPor`), informado por quem chama.
 
-- As regras de transição vivem no **value object `ProjectStatus`** (domínio puro); nenhum controller/
-  adapter as re-codifica (doc 04). Único escritor de `status`: PROJ (ADR-002, R1).
-- `advanceTo` é idempotente e **nunca regride**; a regressão `publicado|com_erros → em_composicao` é
-  `reopen` (D-D). Isto resolve o conflito entre "IMP re-confirma (no-op)" e "editor abre nova revisão".
+## reopen(projetoId)
 
-## Implementação — `advanceTo({ projetoId, targetStatus })`
-
-```
-1. carregar projeto no EmpresaContext do chamador; ausente → NotFound.
-2. current = projeto.status
-3. se targetStatus == current                                   → no-op (changed=false), sem evento
-4. se targetStatus == 'em_composicao' e current ∈ {publicado, com_erros} → no-op (não regride), sem evento
-5. se (current, targetStatus) ∈ tabela legal                    → aplicar, persistir, append histórico,
-                                                                    emitir ProjectStatusChanged (changed=true)
-6. senão                                                         → throw IllegalStatusTransitionError
-```
-
-Tabela legal (api-contract §7): `rascunho→em_composicao`; `em_composicao→publicado|com_erros`;
-`publicado↔com_erros`; (regressão só via `reopen`): `publicado|com_erros→em_composicao`.
-
-## Implementação — `reopen({ projetoId })`
-
-`publicado|com_erros → em_composicao`; no-op idempotente se já `em_composicao`; rejeita de `rascunho`.
+`publicado` ou `com_erros` passam a `em_composicao`, com histórico e evento. Se já estiver em
+`em_composicao`, nada muda. A partir de `rascunho`, é rejeitado.
 
 ## Casos de borda
 
-- IMP re-chama `advanceTo(em_composicao)` num projeto já `publicado` → no-op (não regride) — casa com
-  imp api-contract §8.2.
-- PUB re-exporta: `com_erros → publicado` e `publicado → com_erros` são mudanças reais (emitem evento).
-- `rascunho → publicado` (pular composição) → `IllegalStatusTransitionError` (409 no REST).
-- `targetStatus` inválido → 400 `urn:cordele:proj:validation`.
-- Qualquer transição para `rascunho` → ilegal (estado só-inicial).
+- O IMP confirma a estrutura de novo num projeto que já está `publicado`: nada muda, sem erro.
+- O PUB exporta de novo: `com_erros → publicado` e `publicado → com_erros` são mudanças reais e emitem
+  evento.
+- `rascunho → publicado` (pular a composição): `IllegalStatusTransitionError`, `409` no REST.
+- `targetStatus` desconhecido: `400` com `urn:cordele:proj:validation`.
+- Qualquer transição para `rascunho` é ilegal; é só o estado inicial.
 
-## Critérios de aceite (EARS)
+## Critérios de aceite
 
-- `WHEN advanceTo targets a legal status different from the current one, THE SYSTEM SHALL apply it, append
-  a projeto_status_historico row, emit ProjectStatusChanged, and return changed=true.`
-- `IF targetStatus equals the current status, THEN THE SYSTEM SHALL return changed=false and emit no event.`
-- `IF advanceTo targets em_composicao WHILE the project is publicado or com_erros, THEN THE SYSTEM SHALL
-  return changed=false and never regress.`
-- `IF advanceTo targets publicado or com_erros WHILE the project is rascunho, THEN THE SYSTEM SHALL throw
-  IllegalStatusTransitionError.`
-- `WHEN reopen is called on a publicado or com_erros project, THE SYSTEM SHALL set em_composicao and emit
-  ProjectStatusChanged; IF the project is rascunho, THEN THE SYSTEM SHALL reject.`
-- `THE SYSTEM SHALL be the sole writer of projeto_editorial.status.`
+- Uma transição válida para um status diferente do atual grava a mudança, registra o histórico, emite
+  `ProjectStatusChanged` e devolve `changed = true`.
+- Pedir o status atual devolve `changed = false` e não emite evento.
+- `advanceTo(em_composicao)` com o projeto em `publicado` ou `com_erros` devolve `changed = false`, não
+  emite evento e não muda o status.
+- `advanceTo(publicado)` ou `advanceTo(com_erros)` com o projeto em `rascunho` lança
+  `IllegalStatusTransitionError`.
+- `reopen` em `publicado` ou `com_erros` leva a `em_composicao` e emite evento; em `rascunho`, é rejeitado.
+- Nenhum outro caminho escreve `projeto_editorial.status`.

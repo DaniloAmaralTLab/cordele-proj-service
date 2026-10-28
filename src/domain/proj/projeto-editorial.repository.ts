@@ -1,12 +1,11 @@
 /**
  * Outbound port for ProjetoEditorial persistence.
  *
- * Pure domain interface — zero @nestjs/* and zero @prisma/client imports
- * (RULE-01 / RULE-02). The Prisma adapter implementing this interface is bound
- * in P3 (PROJ-007 / PROJ-008). P2 use cases receive the mock in unit tests.
+ * Pure domain interface — zero @nestjs/* and zero @prisma/client imports.
+ * The Prisma adapter implements it; unit tests use a mock.
  *
  * Every operation is scoped by empresaId — no cross-empresa read path exists by
- * design (ADR-003).
+ * design.
  */
 
 import { ProjetoStatus } from './value-objects/project-status.vo';
@@ -50,14 +49,14 @@ export interface CreateProjetoEditorialInput {
   readonly id: string;
   readonly nome: string;
   readonly descricao?: string;
-  /** Tenant-routing key (resolves the `emp_<slug>` schema, RULE-07). */
+  /** Tenant-routing key (resolves the `emp_<slug>` schema). */
   readonly empresaId: string;
   /** Logical reference to the editora registry (`cordele_global`) — never used for schema routing. */
   readonly editoraId: string;
   readonly status: ProjetoStatus;
 }
 
-/** Input for the updateStatus operation (P3 will persist to projeto_status_historico too). */
+/** Input for the updateStatus operation (also recorded in projeto_status_historico). */
 export interface UpdateStatusInput {
   readonly id: string;
   readonly newStatus: ProjetoStatus;
@@ -90,8 +89,8 @@ export interface AdvanceStatusAtomicResult {
 
 export interface ProjetoEditorialRepository {
   /**
-   * Persists a new ProjetoEditorial row (and its initial status-history entry
-   * in P3, where the Prisma adapter runs both writes in a $transaction).
+   * Persists a new ProjetoEditorial row and its initial status-history entry
+   * in a single $transaction.
    */
   create(input: CreateProjetoEditorialInput): Promise<ProjetoEditorialData>;
 
@@ -100,8 +99,7 @@ export interface ProjetoEditorialRepository {
 
   /**
    * Returns all projects for the empresa ordered by atualizadoEm DESC.
-   * Optional filter narrows by status; limit and cursor are reserved for POC
-   * (accepted without enforcing pagination).
+   * Optional filter narrows by status.
    */
   findAll(
     empresaId: string,
@@ -109,7 +107,7 @@ export interface ProjetoEditorialRepository {
   ): Promise<ProjetoEditorialData[]>;
 
   /**
-   * Applies a status change in a single $transaction (P3) that also appends
+   * Applies a status change in a single $transaction that also appends
    * a projeto_status_historico row.
    */
   updateStatus(input: UpdateStatusInput): Promise<ProjetoEditorialData>;
@@ -122,7 +120,7 @@ export interface ProjetoEditorialRepository {
 
   /**
    * Hard-deletes the ProjetoEditorial row (ON DELETE CASCADE removes history
-   * rows). Used only by DeleteProjetoUseCase (P6 / PROJ-016) as the final
+   * rows). Used only by DeleteProjetoUseCase as the final
    * step of the LGPD erasure cascade, after all cross-context purges succeed.
    */
   delete(id: string, empresaId: string): Promise<void>;
@@ -134,8 +132,8 @@ export interface ProjetoEditorialRepository {
    * writes both the status UPDATE and the projeto_status_historico INSERT inside
    * the same Prisma $transaction (lock held until commit).
    *
-   * Eliminates the TOCTOU window that existed when findById and updateStatus
-   * were called in separate transactions (PROJ-004 concurrent double-emit fix).
+   * Holding the row lock across the read and the write serializes concurrent
+   * calls, so only one of them reports changed=true.
    * Returns null when the project does not exist in this empresa.
    * Throws IllegalStatusTransitionError for illegal moves.
    */

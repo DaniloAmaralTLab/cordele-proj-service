@@ -2,7 +2,7 @@
  * Unit spec for ProjectStatusVO — covers every edge in the legal-transition table
  * from api-contract §7, all idempotent no-ops, and all rejection cases.
  *
- * Zero @nestjs/* / @prisma/client imports (RULE-01 / RULE-02).
+ * Zero @nestjs/* / @prisma/client imports.
  */
 
 import { IllegalStatusTransitionError } from '../errors/illegal-status-transition.error';
@@ -92,7 +92,7 @@ describe('ProjectStatusVO', () => {
       expect(result.newStatus).toBe(ProjetoStatus.rascunho);
     });
 
-    it('advanceTo(em_composicao, em_composicao) returns changed=false — IMP idempotency rule (SPEC-02)', () => {
+    it('advanceTo(em_composicao, em_composicao) returns changed=false — IMP idempotency rule', () => {
       const result = ProjectStatusVO.advanceTo(
         ProjetoStatus.em_composicao,
         ProjetoStatus.em_composicao,

@@ -38,7 +38,7 @@ const _storage = new AsyncLocalStorage<EmpresaContextData>();
  * - `EmpresaContextStore.getEditoraId()` — read editoraId; throws outside context
  * - `EmpresaContextStore.getSlug()` — read slug; throws outside context
  *
- * ### RULE compliance
+ * ### Dependencies
  * This file is in `infrastructure/` and may import Node built-ins only. It does
  * NOT import `@nestjs/*` or `@prisma/client` so it can be loaded by test helpers
  * and scripts without the full Nest runtime.

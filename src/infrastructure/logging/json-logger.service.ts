@@ -1,10 +1,10 @@
 /**
- * JsonLoggerService — structured JSON logger for proj-service (PROJ-017).
+ * JsonLoggerService — structured JSON logger for proj-service.
  *
  * Implements NestJS LoggerService so that `app.useLogger(new JsonLoggerService())`
  * replaces the default console formatter with newline-delimited JSON entries.
  *
- * Every log entry includes the required PROJ-017 fields:
+ * Every log entry includes these fields:
  *   - `level`         : severity string (info / warn / error / debug / verbose)
  *   - `message`       : log message string (stubs include `port=<PortName>` and
  *                       `degraded:true` when in degraded mode)
@@ -14,12 +14,10 @@
  *
  * The `correlationId` field is written into the log message by callers that
  * have access to the async correlation context (e.g. a WARN emitted by a port
- * stub that receives `empresaId` but not `correlationId` via the port interface
- * — full propagation requires a shared AsyncLocalStorage store, deferred to a
- * future iteration).
+ * stub that receives `empresaId` but not `correlationId` via the port interface).
  *
- * RULE-05: infrastructure/ must not import modules/.
- * RULE-08: no console.log — all output via process.stdout / process.stderr.
+ * infrastructure/ does not import modules/.
+ * No console.log — all output via process.stdout / process.stderr.
  */
 
 import { LoggerService } from '@nestjs/common';

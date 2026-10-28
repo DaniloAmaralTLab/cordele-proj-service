@@ -5,8 +5,7 @@ import type { UsuarioContext } from '../../../domain/shared/usuario-context.inte
 /**
  * Shape attached to `request.user` by `JwtStrategy.validate`
  * (`infrastructure/auth/jwt.strategy.ts`). Duplicated here — not imported —
- * so this file stays RULE-04 compliant (modules/ does not import
- * infrastructure/ directly).
+ * because modules/ does not import infrastructure/ directly.
  */
 interface RequestPrincipal {
   readonly userId: string;

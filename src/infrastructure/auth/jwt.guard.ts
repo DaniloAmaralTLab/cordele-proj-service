@@ -36,7 +36,7 @@ export const Public = (): MethodDecorator & ClassDecorator =>
  * Kept here for parity with `jwt-auth.guard.spec.ts`; controllers under
  * `modules/proj/` must use `RequiredScopes` from
  * `modules/proj/decorators/require-scope.decorator.ts` instead of importing
- * this file directly (RULE-04).
+ * this file directly.
  */
 export const RequiredScopes = (...scopes: string[]): MethodDecorator & ClassDecorator =>
   SetMetadata(REQUIRED_SCOPES_KEY, scopes);
@@ -59,7 +59,7 @@ export const CurrentUser = createParamDecorator(
  *   - Missing or expired token  → 401 `urn:cordele:proj:unauthorized`
  *   - Valid token, wrong scope  → 403 `urn:cordele:proj:forbidden`
  *   - Valid token, correct scope → populates `request.user` with the verified
- *     principal and allows the request through (RULE-07).
+ *     principal and allows the request through.
  *
  * `EmpresaContextStore` (ALS) is populated by `EmpresaContextInterceptor` —
  * which runs AFTER this guard — NOT here. Attempting `EmpresaContextStore.enterWith()`
@@ -72,7 +72,7 @@ export const CurrentUser = createParamDecorator(
  * `app.module.ts`. `@Public()` opts a route out of authentication (health,
  * webhooks). `@RequiredScopes()` restricts a route to one or more OAuth2 scopes.
  *
- * RULE-04: this file lives in `infrastructure/auth/` and is never imported
+ * This file lives in `infrastructure/auth/` and is never imported
  * directly by anything under `modules/`.
  */
 @Injectable()

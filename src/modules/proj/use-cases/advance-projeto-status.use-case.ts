@@ -2,15 +2,13 @@
  * AdvanceProjetoStatusUseCase — the only mechanism for forward status transitions.
  *
  * Called by IMP (rascunho → em_composicao on confirm-estrutura) and PUB
- * (em_composicao → publicado|com_erros on export result). ADR-002 / D-D.
+ * (em_composicao → publicado|com_erros on export result).
  *
- * Business rules (api-contract §7 / SPEC-02):
+ * Business rules (api-contract §7):
  *   - Delegates to ProjectStatusVO.advanceTo for transition validation.
  *   - On actual change: persists update + emits ProjectStatusChanged.
  *   - On idempotent no-op (same status): returns { changed: false } without event.
  *   - On illegal transition: surfaces IllegalStatusTransitionError.
- *
- * RULE-04: this file is in modules/ and does NOT import from infrastructure/.
  */
 
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
@@ -50,7 +48,7 @@ export class AdvanceProjetoStatusUseCase {
   /**
    * Advances the status of a ProjetoEditorial.
    *
-   * PROJ-004 TOCTOU fix: delegates to repository.advanceStatusAtomic which
+   * Delegates to repository.advanceStatusAtomic, which
    * acquires a SELECT FOR UPDATE lock, re-validates the transition under the
    * lock, and writes the change in a single transaction. Concurrent calls for
    * the same projetoId serialize at the DB row lock — at most one commits

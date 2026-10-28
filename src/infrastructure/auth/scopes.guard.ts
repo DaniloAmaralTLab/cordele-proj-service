@@ -23,8 +23,7 @@ interface RequestPrincipal {
  * Note: `JwtAuthGuard` (registered globally via `APP_GUARD`) already performs
  * inline scope enforcement via `@RequiredScopes()` / `REQUIRED_SCOPES_KEY`.
  * `ScopesGuard` provides the same capability bound to the `@Scopes()` metadata
- * key, satisfying PROJ-014 checklist item 2 for a standalone, independently
- * testable guard class.
+ * key, as a standalone, independently testable guard class.
  */
 @Injectable()
 export class ScopesGuard implements CanActivate {

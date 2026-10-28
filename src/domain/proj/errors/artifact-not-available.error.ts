@@ -3,9 +3,9 @@
  * not available for download.
  *
  * Publications in status `erros_criticos` or `pendente` have no ePub artifact
- * ready; requesting a signed URL for them must yield 409 (api-contract §4.5 / D-F).
+ * ready; requesting a signed URL for them must yield 409 (api-contract §4.5).
  *
- * Pure domain error — no @nestjs/* or @prisma/client imports (RULE-01 / RULE-02).
+ * Pure domain error — no @nestjs/* or @prisma/client imports.
  * REST callers map this to 409 urn:cordele:proj:artifact-not-available.
  */
 export class ArtifactNotAvailableError extends Error {

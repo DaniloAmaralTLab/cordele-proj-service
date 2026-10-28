@@ -4,19 +4,16 @@
  * Calls IMP service's internal batch-query endpoint to retrieve manuscript
  * summaries for a list of project IDs. Registered under MANUSCRIPT_SUMMARY_PORT
  * when the IMP_SERVICE_URL environment variable is set (env-flag switch in
- * proj.module.ts — PROJ-INT-001).
+ * read-ports.module.ts).
  *
- * RULE-05: infrastructure must not import modules/.
- * RULE-06: this is the correct place for outbound HTTP clients.
+ * Outbound HTTP clients live in infrastructure/; no modules/ imports.
  *
  * Chunking:
  *   projetoIds is split into blocks of CROSS_SERVICE_BATCH_LIMIT (50) because
  *   the IMP batch endpoint rejects requests larger than 50 IDs with HTTP 400
- *   (contractual limit, see IMP api-contract.md). Blocks are fetched in parallel
- *   via Promise.allSettled to reduce latency — the use case already sequences
- *   the three adapters, so parallelism within an adapter avoids quadrupling the
- *   end-to-end time for large libraries (152 IDs = 4 blocks; 4 parallel fetches
- *   cost one network round-trip, not four).
+ *   (contractual limit of the IMP batch endpoint). Blocks are fetched in parallel
+ *   via Promise.allSettled to reduce latency for large libraries (152 IDs =
+ *   4 blocks; 4 parallel fetches cost one network round-trip, not four).
  *
  * Partial degradation:
  *   - All blocks succeed → returns merged Map, no exception.
@@ -28,7 +25,7 @@
  *
  * Bearer token is forwarded from the originating request so the IMP service
  * validates the same JWT principal and scope (imp:read). The header is mounted
- * only when a token is present; its value is never logged (security gate).
+ * only when a token is present; its value is never logged.
  */
 
 import { Injectable, Logger } from '@nestjs/common';

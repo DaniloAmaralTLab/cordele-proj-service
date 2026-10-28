@@ -21,7 +21,7 @@ export const CORRELATION_ID_HEADER = 'x-correlation-id';
  *
  * Wired globally via `APP_INTERCEPTOR` in `AppModule` so the header is
  * present on every response — including error paths handled by exception
- * filters (RULE-08: no `console.log`; interceptor uses no logging because
+ * filters (no `console.log`; the interceptor uses no logging because
  * every route already benefits from the Nest request lifecycle logger).
  */
 @Injectable()

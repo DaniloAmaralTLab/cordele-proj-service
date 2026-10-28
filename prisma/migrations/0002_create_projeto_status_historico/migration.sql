@@ -1,7 +1,6 @@
 -- =============================================================================
 -- Migration 0002: create_projeto_status_historico
 -- Service:   proj-service
--- Source:    docs/architecture/backend/services/proj-service/contracts/data-model.md §2.2
 --
 -- Creates the append-only audit table for status transitions.
 -- FK with ON DELETE CASCADE: removing a ProjetoEditorial removes all its history.

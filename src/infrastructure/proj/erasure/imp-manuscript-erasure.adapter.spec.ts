@@ -1,5 +1,5 @@
 /**
- * Unit tests for ImpManuscriptErasureAdapter (PROJ-INT-004).
+ * Unit tests for ImpManuscriptErasureAdapter.
  *
  * Mirrors PubPublicationErasureAdapter's non-degraded contract: every failure
  * path must throw so DeleteProjetoUseCase aborts the cascade.
@@ -45,7 +45,7 @@ describe('ImpManuscriptErasureAdapter', () => {
 
   it('resolves (idempotent) when project has no manuscripts — IMP returns 204 no-op', async () => {
     // IMP is idempotent: when there are no manuscripts for the project it returns 204 (safe no-op).
-    // The adapter must complete without error so the LGPD cascade (PROJ-016) can proceed.
+    // The adapter must complete without error so the LGPD cascade can proceed.
     mockFetch.mockResolvedValue({ ok: true, status: 204 });
 
     await expect(adapter.erase('projeto-sem-manuscritos', 'emp-aetos')).resolves.toBeUndefined();
